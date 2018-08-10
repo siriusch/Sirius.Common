@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Sirius.Common.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ArrayContentEqualityComparer.cs" />
