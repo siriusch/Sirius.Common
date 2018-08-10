@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>Sirius.Common</id>
+		<version>1.0.0</version>
+		<authors>siriusch</authors>
+		<owners>siriusch</owners>
+		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+		<projectUrl>https://github.com/siriusch/Sirius.Common</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>.NET Library with types and functions used by other Sirius projects</description>
+		<copyright>Copyright 2018 Sirius Technologies AG</copyright>
+		<tags>Sirius Common</tags>
+		<dependencies />
+	</metadata>
+	<files>
+		<file src="bin\$Configuration$\Sirius.Common.dll" target="lib/net461"  />
+		<file src="bin\$Configuration$\Sirius.Common.pdb" target="lib/net461" />
+		<!--file src="bin\$Configuration$\Sirius.Common.xml" target="lib/net461" /-->
+	</files>
+</package>
