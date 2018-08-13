@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using Xunit;
@@ -23,7 +23,7 @@ namespace Sirius.Collections {
 		[Fact]
 		public void Fifo() {
 			// tiny buffer capacity so that we can test the different methods with buffer breakover
-			var buffer = new LinkedFifoBuffer<byte>(4, 0);
+			var buffer = new LinkedFifoBuffer<byte>(4);
 			var position = buffer.HeadPosition;
 			for (byte i = 1; i <= 4; i++) {
 				LinkedFifoBuffer<byte>.Write(ref buffer, i);

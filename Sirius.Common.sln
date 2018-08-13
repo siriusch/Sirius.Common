@@ -26,7 +26,6 @@ Global
 		{9142A9C0-3BDA-4202-80EC-AD819AD77CDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9142A9C0-3BDA-4202-80EC-AD819AD77CDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9142A9C0-3BDA-4202-80EC-AD819AD77CDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9142A9C0-3BDA-4202-80EC-AD819AD77CDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
