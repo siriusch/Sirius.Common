@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Sirius.Linq")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Sirius.Common")]
+[assembly: AssemblyDescription(".NET Library with types and functions used by other Sirius projects")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Sirius.Linq")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCompany("Sirius Technologies AG")]
+[assembly: AssemblyProduct("Sirius.Common")]
+[assembly: AssemblyCopyright("Copyright © Sirius Technologies AG 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
