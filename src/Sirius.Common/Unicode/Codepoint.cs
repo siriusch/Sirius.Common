@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -58,7 +58,7 @@ namespace Sirius.Unicode {
 		}
 
 		public static implicit operator Codepoint(char value) {
-			return new Codepoint(value);
+			return new Codepoint(value, false);
 		}
 
 		public static explicit operator int(Codepoint codepoint) {
@@ -66,7 +66,7 @@ namespace Sirius.Unicode {
 		}
 
 		public static explicit operator Codepoint(int value) {
-			return new Codepoint(value);
+			return new Codepoint(value, false);
 		}
 
 		public static bool IsValid(Codepoint codepoint) {

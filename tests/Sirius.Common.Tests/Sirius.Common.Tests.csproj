@@ -92,14 +92,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Unicode\" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Collections\ExtensionsTest.cs" />
     <Compile Include="Collections\LinkedFifoBufferTest.cs" />
     <Compile Include="IncrementorTest.cs" />
     <Compile Include="Numerics\BigDecimalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unicode\CodepointsTest.cs" />
+    <Compile Include="Unicode\CodepointTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
