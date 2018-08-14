@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -190,7 +190,7 @@ namespace Sirius.Unicode {
 			{ "InSmall_Form_Variants", new RangeSet<Codepoint>(Range<Codepoint>.Create('\uFE50', '\uFE6F')) },
 			{ "InArabic_Presentation_Forms-B", new RangeSet<Codepoint>(Range<Codepoint>.Create('\uFE70', '\uFEFF')) },
 			{ "InHalfwidth_and_Fullwidth_Forms", new RangeSet<Codepoint>(Range<Codepoint>.Create('\uFF00', '\uFFEF')) },
-			{ "InSpecials", new RangeSet<Codepoint>(Range<Codepoint>.Create('\uFFF0', '\uFFFF')) }
+			{ "InSpecials", new RangeSet<Codepoint>(Range<Codepoint>.Create('\uFFF0', '\uFFFD')) }
 		};
 
 		public static RangeSet<Codepoint> FromUnicodeCategory(UnicodeCategory category) {

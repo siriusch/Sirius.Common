@@ -97,6 +97,7 @@
     <Compile Include="IncrementorTest.cs" />
     <Compile Include="Numerics\BigDecimalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unicode\CodepointSetTest.cs" />
     <Compile Include="Unicode\CodepointsTest.cs" />
     <Compile Include="Unicode\CodepointTest.cs" />
   </ItemGroup>
