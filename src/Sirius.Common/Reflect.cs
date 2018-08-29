@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
-using Sirius.Collections;
 
 namespace Sirius {
 	public static class Reflect<TType> {
@@ -102,11 +100,7 @@ namespace Sirius {
 			return expression.Constructor;
 		}
 
-		public static Expression AsExpression(this Expression<Action> that) {
-			return that.Body;
-		}
-
-		public static Expression AsExpression<TResult>(this Expression<Func<TResult>> that) {
+		public static Expression AsExpression(this LambdaExpression that) {
 			return that.Body;
 		}
 

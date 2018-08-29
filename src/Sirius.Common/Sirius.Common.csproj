@@ -48,6 +48,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
@@ -83,6 +84,11 @@
     <Compile Include="StringHelper.cs" />
     <Compile Include="SymbolId.cs" />
     <Compile Include="SymbolIdSequence.cs" />
+    <Compile Include="Text\ConsoleTextWriter.cs" />
+    <Compile Include="Text\DelegateTextWriter.cs" />
+    <Compile Include="Text\IStyleProvider.cs" />
+    <Compile Include="Text\NullTextWriter.cs" />
+    <Compile Include="Text\RichTextWriter.cs" />
     <Compile Include="Unicode\Codepoint.cs" />
     <Compile Include="Unicode\Codepoints.cs" />
     <Compile Include="Unicode\Grapheme.cs" />
