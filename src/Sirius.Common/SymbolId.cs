@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Sirius {
 	public struct SymbolId: IEquatable<SymbolId> {
@@ -7,20 +7,32 @@ namespace Sirius {
 		public static explicit operator int(SymbolId id) => id.id;
 
 		public static bool operator ==(SymbolId left, SymbolId right) {
-			return left.Equals(right);
+			return left.id == right.id;
 		}
 
 		public static bool operator !=(SymbolId left, SymbolId right) {
-			return !left.Equals(right);
+			return left.id != right.id;
 		}
 
-		private const int EofId = int.MinValue;
-		private const int AcceptId = int.MinValue+1;
-		private const int RejectId = int.MinValue+2;
+		public static bool operator ==(int left, SymbolId right) {
+			return left == right.id;
+		}
 
-		public static SymbolId Eof = new SymbolId(EofId);
-		public static SymbolId Accept = new SymbolId(AcceptId);
-		public static SymbolId Reject = new SymbolId(RejectId);
+		public static bool operator !=(int left, SymbolId right) {
+			return left != right.id;
+		}
+
+		public static bool operator ==(SymbolId left, int right) {
+			return left.id == right;
+		}
+
+		public static bool operator !=(SymbolId left, int right) {
+			return left.id != right;
+		}
+
+		public const int Eof = int.MinValue;
+		public const int Accept = int.MinValue + 1;
+		public const int Reject = int.MinValue + 2;
 
 		private readonly int id;
 
@@ -33,18 +45,19 @@ namespace Sirius {
 		}
 
 		public override bool Equals(object obj) {
-			if (ReferenceEquals(null, obj)) {
-				return false;
-			}
-			return obj is SymbolId && Equals((SymbolId)obj);
+			return obj is SymbolId && this.Equals((SymbolId)obj);
 		}
 
 		public override int GetHashCode() {
 			return this.id;
 		}
 
+		public int ToInt32() {
+			return this.id;
+		}
+
 		public override string ToString() {
-			return ToString(null);
+			return this.ToString(null);
 		}
 
 		public string ToString(Func<SymbolId, string> resolver) {
@@ -53,11 +66,11 @@ namespace Sirius {
 				return result;
 			}
 			switch (this.id) {
-			case AcceptId:
+			case Accept:
 				return "(Accept)";
-			case RejectId:
+			case Reject:
 				return "(Reject)";
-			case EofId:
+			case Eof:
 				return "(Eof)";
 			default:
 				return $"Symbol:{this.id}";
