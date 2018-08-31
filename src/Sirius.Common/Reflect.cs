@@ -100,7 +100,7 @@ namespace Sirius {
 			return expression.Constructor;
 		}
 
-		public static Expression AsExpression(this LambdaExpression that) {
+		public static Expression AsExpression<T>(this Expression<T> that) {
 			return that.Body;
 		}
 

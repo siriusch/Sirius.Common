@@ -126,7 +126,7 @@ namespace Sirius.Collections {
 		}
 
 		public static RangeSet<T> Union(params IRangeSet<T>[] rangeSets) {
-			return Union((IEnumerable<RangeSet<T>>)rangeSets);
+			return Union((IEnumerable<IRangeSet<T>>)rangeSets);
 		}
 
 		public static RangeSet<T> Union(IEnumerable<IRangeSet<T>> rangeSets) {
