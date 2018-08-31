@@ -1,9 +1,13 @@
-﻿using System;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Sirius.Collections {
 	public static class LinqExtensions {
+		private static readonly ConcurrentDictionary<Type, MethodInfo> indexerGetter = new ConcurrentDictionary<Type, MethodInfo>();
+
 		public static IEnumerable<T> Prepend<T>(this IEnumerable<T> that, T itemToPrepend) {
 			yield return itemToPrepend;
 			foreach (var item in that) {
@@ -76,7 +80,7 @@ namespace Sirius.Collections {
 						return comparer.Equals(currX, currY);
 					}
 					xSet = new HashSet<T> {
-						currX
+							currX
 					};
 					if (hasX) {
 						do {
@@ -84,7 +88,7 @@ namespace Sirius.Collections {
 						} while (xEnum.MoveNext());
 					}
 					ySet = new HashSet<T> {
-						currY
+							currY
 					};
 					if (hasY) {
 						do {
@@ -174,6 +178,26 @@ namespace Sirius.Collections {
 				}
 			}
 			return that.Count > count;
+		}
+
+		public static Func<TKey, TValue> CreateGetter<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> that) {
+			var indexerGetter = LinqExtensions.indexerGetter.GetOrAdd(typeof(IReadOnlyDictionary<TKey, TValue>), type => Reflect<IReadOnlyDictionary<TKey, TValue>>.GetProperty(d => d[default(TKey)]).GetMethod);
+			return (Func<TKey, TValue>)Delegate.CreateDelegate(typeof(Func<TKey, TValue>), that, indexerGetter, true);
+		}
+
+		public static Func<TKey, TValue> CreateGetter<TKey, TValue>(this IDictionary<TKey, TValue> that) {
+			var indexerGetter = LinqExtensions.indexerGetter.GetOrAdd(typeof(IDictionary<TKey, TValue>), type => Reflect<IDictionary<TKey, TValue>>.GetProperty(d => d[default(TKey)]).GetMethod);
+			return (Func<TKey, TValue>)Delegate.CreateDelegate(typeof(Func<TKey, TValue>), that, indexerGetter, true);
+		}
+
+		public static Func<int, T> CreateGetter<T>(this IReadOnlyList<T> that) {
+			var indexerGetter = LinqExtensions.indexerGetter.GetOrAdd(typeof(IReadOnlyList<T>), type => Reflect<IReadOnlyList<T>>.GetProperty(d => d[default(int)]).GetMethod);
+			return (Func<int, T>)Delegate.CreateDelegate(typeof(Func<int, T>), that, indexerGetter, true);
+		}
+
+		public static Func<int, T> CreateGetter<T>(this IList<T> that) {
+			var indexerGetter = LinqExtensions.indexerGetter.GetOrAdd(typeof(IList<T>), type => Reflect<IList<T>>.GetProperty(d => d[default(int)]).GetMethod);
+			return (Func<int, T>)Delegate.CreateDelegate(typeof(Func<int, T>), that, indexerGetter, true);
 		}
 	}
 }
