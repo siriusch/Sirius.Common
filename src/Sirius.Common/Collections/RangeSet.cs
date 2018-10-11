@@ -8,8 +8,140 @@ using System.Threading;
 namespace Sirius.Collections {
 	public sealed class RangeSet<T>: IEquatable<RangeSet<T>>, IRangeSet<T>
 			where T: IComparable<T> {
+		public static implicit operator RangeSet<T>(Range<T>[] ranges) {
+			return new RangeSet<T>((IEnumerable<Range<T>>)ranges);
+		}
+
 		public static implicit operator RangeSet<T>(Range<T> range) {
 			return new RangeSet<T>(range);
+		}
+
+		public static implicit operator RangeSet<T>(T single) {
+			return new RangeSet<T>(single);
+		}
+
+		public static bool operator ==(RangeSet<T> left, RangeSet<T> right) {
+			return Equals(left, right);
+		}
+
+		public static bool operator !=(RangeSet<T> left, RangeSet<T> right) {
+			return !Equals(left, right);
+		}
+
+		public static RangeSet<T> operator -(RangeSet<T> left, RangeSet<T> right) {
+			return Subtract(left, right);
+		}
+
+		public static RangeSet<T> operator |(RangeSet<T> left, RangeSet<T> right) {
+			return Union(left, right);
+		}
+
+		public static RangeSet<T> operator &(RangeSet<T> left, RangeSet<T> right) {
+			return Intersection(left, right);
+		}
+
+		public static RangeSet<T> operator ^(RangeSet<T> left, RangeSet<T> right) {
+			return Difference(left, right);
+		}
+
+		public static bool operator ==(Range<T> left, RangeSet<T> right) {
+			return Equals(new RangeSet<T>(left), right);
+		}
+
+		public static bool operator !=(Range<T> left, RangeSet<T> right) {
+			return !Equals(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator -(Range<T> left, RangeSet<T> right) {
+			return Subtract(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator |(Range<T> left, RangeSet<T> right) {
+			return Union(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator &(Range<T> left, RangeSet<T> right) {
+			return Intersection(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator ^(Range<T> left, RangeSet<T> right) {
+			return Difference(new RangeSet<T>(left), right);
+		}
+
+		public static bool operator ==(T left, RangeSet<T> right) {
+			return Equals(new RangeSet<T>(left), right);
+		}
+
+		public static bool operator !=(T left, RangeSet<T> right) {
+			return !Equals(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator -(T left, RangeSet<T> right) {
+			return Subtract(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator |(T left, RangeSet<T> right) {
+			return Union(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator &(T left, RangeSet<T> right) {
+			return Intersection(new RangeSet<T>(left), right);
+		}
+
+		public static RangeSet<T> operator ^(T left, RangeSet<T> right) {
+			return Difference(new RangeSet<T>(left), right);
+		}
+
+		public static bool operator ==(RangeSet<T> left, Range<T> right) {
+			return Equals(left, new RangeSet<T>(right));
+		}
+
+		public static bool operator !=(RangeSet<T> left, Range<T> right) {
+			return !Equals(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator -(RangeSet<T> left, Range<T> right) {
+			return Subtract(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator |(RangeSet<T> left, Range<T> right) {
+			return Union(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator &(RangeSet<T> left, Range<T> right) {
+			return Intersection(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator ^(RangeSet<T> left, Range<T> right) {
+			return Difference(left, new RangeSet<T>(right));
+		}
+
+		public static bool operator ==(RangeSet<T> left, T right) {
+			return Equals(left, new RangeSet<T>(right));
+		}
+
+		public static bool operator !=(RangeSet<T> left, T right) {
+			return !Equals(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator -(RangeSet<T> left, T right) {
+			return Subtract(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator |(RangeSet<T> left, T right) {
+			return Union(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator &(RangeSet<T> left, T right) {
+			return Intersection(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator ^(RangeSet<T> left, T right) {
+			return Difference(left, new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator ~(RangeSet<T> set) {
+			return Negate(set);
 		}
 
 		private static readonly Lazy<RangeSet<T>> all = new Lazy<RangeSet<T>>(() => new RangeSet<T>(Range<T>.All), LazyThreadSafetyMode.PublicationOnly);
@@ -19,6 +151,16 @@ namespace Sirius.Collections {
 		} = new RangeSet<T>(new Range<T>[0]);
 
 		public static RangeSet<T> All => all.Value;
+
+		public static bool Equals(IRangeSet<T> left, IRangeSet<T> right) {
+			if (ReferenceEquals(left, right)) {
+				return true;
+			}
+			if (ReferenceEquals(left, null) || ReferenceEquals(right, null)) {
+				return false;
+			}
+			return left.SequenceEqual(right);
+		}
 
 		public static IEnumerable<TResult> EnumerateRanges<TResult>(IRangeSet<T> left, IRangeSet<T> right, Func<Range<T>, int?, int?, TResult> process) {
 			using (var enumLeft = left.GetEnumerator()) {
@@ -82,24 +224,24 @@ namespace Sirius.Collections {
 			if (x.Count == 0) {
 				return Empty;
 			}
-			if (y.Count == 0 && x is RangeSet<T> setX) {
+			if ((y.Count == 0) && x is RangeSet<T> setX) {
 				return setX;
 			}
 			return new RangeSet<T>(EnumerateRanges(x, y).Where(r => r.Value == ContainedIn.Left).Select(r => r.Key).NormalizeFromSorted().ToArray());
 		}
 
 		public static RangeSet<T> Difference(IRangeSet<T> x, IRangeSet<T> y) {
-			if (y.Count == 0 && x is RangeSet<T> setX) {
+			if ((y.Count == 0) && x is RangeSet<T> setX) {
 				return setX;
 			}
-			if (y.Count == 0 && x is RangeSet<T> setY) {
+			if ((y.Count == 0) && x is RangeSet<T> setY) {
 				return setY;
 			}
 			return new RangeSet<T>(EnumerateRanges(x, y).Where(r => r.Value != ContainedIn.Both).Select(r => r.Key).NormalizeFromSorted().ToArray());
 		}
 
 		public static RangeSet<T> Intersection(IRangeSet<T> x, IRangeSet<T> y) {
-			if (x.Count == 0 || y.Count == 0) {
+			if ((x.Count == 0) || (y.Count == 0)) {
 				return Empty;
 			}
 			return new RangeSet<T>(EnumerateRanges(x, y).Where(r => r.Value == ContainedIn.Both).Select(r => r.Key).NormalizeFromSorted().ToArray());
@@ -116,10 +258,10 @@ namespace Sirius.Collections {
 		}
 
 		public static RangeSet<T> Union(IRangeSet<T> x, IRangeSet<T> y) {
-			if (y.Count == 0 && x is RangeSet<T> setX) {
+			if ((y.Count == 0) && x is RangeSet<T> setX) {
 				return setX;
 			}
-			if (y.Count == 0 && x is RangeSet<T> setY) {
+			if ((y.Count == 0) && x is RangeSet<T> setY) {
 				return setY;
 			}
 			return new RangeSet<T>(EnumerateRanges(x, y).Select(r => r.Key).NormalizeFromSorted().ToArray());
@@ -144,9 +286,9 @@ namespace Sirius.Collections {
 
 		private readonly Range<T>[] ranges;
 
-		public RangeSet(T item): this(new[] { new Range<T>(item, item) }) { }
+		public RangeSet(T item): this(new[] {new Range<T>(item, item)}) { }
 
-		public RangeSet(Range<T> item): this(new[] { item }) { }
+		public RangeSet(Range<T> item): this(new[] {item}) { }
 
 		public RangeSet(IEnumerable<T> items): this(items.Condense().ToArray()) { }
 
@@ -169,7 +311,7 @@ namespace Sirius.Collections {
 		public int Count => this.ranges.Length;
 
 		IEnumerator IEnumerable.GetEnumerator() {
-			return GetEnumerator();
+			return this.GetEnumerator();
 		}
 
 		public bool Contains(T item) {
@@ -177,7 +319,7 @@ namespace Sirius.Collections {
 		}
 
 		public override bool Equals(object obj) {
-			return Equals(obj as RangeSet<T>);
+			return this.Equals(obj as RangeSet<T>);
 		}
 
 		public IEnumerable<T> Expand() {
@@ -185,11 +327,11 @@ namespace Sirius.Collections {
 		}
 
 		public override int GetHashCode() {
-			return this.ranges.Aggregate(GetType().GetHashCode(), (hc, range) => hc^range.GetHashCode());
+			return this.ranges.Aggregate(this.GetType().GetHashCode(), (hc, range) => hc ^ range.GetHashCode());
 		}
 
 		public override string ToString() {
-			return "["+string.Join(",", this.ranges.Select(r => r.ToString()))+"]";
+			return "[" + string.Join(",", this.ranges.Select(r => r.ToString())) + "]";
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -9,12 +9,64 @@ namespace Sirius.Collections {
 
 		public static Range<T> All => all.Value;
 
+		public static RangeSet<T> operator ~(Range<T> range) {
+			return RangeSet<T>.Negate(new RangeSet<T>(range));
+		}
+
 		public static bool operator ==(Range<T> left, Range<T> right) {
 			return left.Equals(right);
 		}
 
 		public static bool operator !=(Range<T> left, Range<T> right) {
 			return !left.Equals(right);
+		}
+
+		public static RangeSet<T> operator -(Range<T> left, Range<T> right) {
+			return RangeSet<T>.Subtract(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator |(Range<T> left, Range<T> right) {
+			return RangeSet<T>.Union(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator &(Range<T> left, Range<T> right) {
+			return RangeSet<T>.Intersection(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator ^(Range<T> left, Range<T> right) {
+			return RangeSet<T>.Difference(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator -(T left, Range<T> right) {
+			return RangeSet<T>.Subtract(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator |(T left, Range<T> right) {
+			return RangeSet<T>.Union(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator &(T left, Range<T> right) {
+			return RangeSet<T>.Intersection(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator ^(T left, Range<T> right) {
+			return RangeSet<T>.Difference(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator -(Range<T> left, T right) {
+			return RangeSet<T>.Subtract(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator |(Range<T> left, T right) {
+			return RangeSet<T>.Union(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator &(Range<T> left, T right) {
+			return RangeSet<T>.Intersection(new RangeSet<T>(left), new RangeSet<T>(right));
+		}
+
+		public static RangeSet<T> operator ^(Range<T> left, T right) {
+			return RangeSet<T>.Difference(new RangeSet<T>(left), new RangeSet<T>(right));
 		}
 
 		public static Range<T> Create(T single) {
@@ -43,11 +95,11 @@ namespace Sirius.Collections {
 
 		public int Count() {
 			if (typeof(IConvertible).IsAssignableFrom(typeof(T))) {
-				return (((IConvertible)this.To).ToInt32(CultureInfo.InvariantCulture)-((IConvertible)this.From).ToInt32(CultureInfo.InvariantCulture))+1;
+				return (((IConvertible)this.To).ToInt32(CultureInfo.InvariantCulture) - ((IConvertible)this.From).ToInt32(CultureInfo.InvariantCulture)) + 1;
 			}
 			int result = 0;
-			T current = From;
-			while (current.CompareTo(To) < 0) {
+			T current = this.From;
+			while (current.CompareTo(this.To) < 0) {
 				result++;
 				current = Incrementor<T>.Increment(current);
 			}
@@ -92,12 +144,12 @@ namespace Sirius.Collections {
 			if (ReferenceEquals(null, obj)) {
 				return false;
 			}
-			return obj is Range<T> && Equals((Range<T>)obj);
+			return obj is Range<T> && this.Equals((Range<T>)obj);
 		}
 
 		public override int GetHashCode() {
 			unchecked {
-				return (EqualityComparer<T>.Default.GetHashCode(this.From) * 397)^EqualityComparer<T>.Default.GetHashCode(this.To);
+				return (EqualityComparer<T>.Default.GetHashCode(this.From) * 397) ^ EqualityComparer<T>.Default.GetHashCode(this.To);
 			}
 		}
 	}
