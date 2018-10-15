@@ -93,6 +93,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\CaptureTest.cs" />
     <Compile Include="Collections\ExtensionsTest.cs" />
     <Compile Include="Collections\LinkedFifoBufferTest.cs" />
     <Compile Include="Collections\RangeSetTest.cs" />

@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ArrayContentEqualityComparer.cs" />
+    <Compile Include="Collections\Capture.cs" />
     <Compile Include="Collections\IdComparer.cs" />
     <Compile Include="Collections\IRangeSet.cs" />
     <Compile Include="Collections\IReadWriteList.cs" />
