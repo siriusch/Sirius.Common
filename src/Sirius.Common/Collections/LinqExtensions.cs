@@ -31,6 +31,89 @@ namespace Sirius.Collections {
 			}
 		}
 
+		public static int IndexOf<T>(this IEnumerable<T> that, T value) {
+			return that.IndexOf(value, 0, int.MaxValue, null);
+		}
+
+		public static int IndexOf<T>(this IEnumerable<T> that, T value, int startIndex) {
+			return that.IndexOf(value, startIndex, int.MaxValue, null);
+		}
+
+		public static int IndexOf<T>(this IEnumerable<T> that, T value, int startIndex, int count) {
+			return that.IndexOf(value, startIndex, count, null);
+		}
+
+		public static int IndexOf<T>(this IEnumerable<T> that, T value, IEqualityComparer<T> comparer) {
+			return that.IndexOf(value, 0, int.MaxValue, comparer);
+		}
+
+		public static int IndexOf<T>(this IEnumerable<T> that, T value, int startIndex, IEqualityComparer<T> comparer) {
+			return that.IndexOf(value, startIndex, int.MaxValue, comparer);
+		}
+
+		public static int IndexOf<T>(this IEnumerable<T> that, T value, int startIndex, int count, IEqualityComparer<T> comparer) {
+			if (startIndex < 0) {
+				throw new ArgumentOutOfRangeException(nameof(startIndex));
+			}
+			if (count < 0) {
+				throw new ArgumentOutOfRangeException(nameof(count));
+			}
+			if (comparer == null) {
+				comparer = EqualityComparer<T>.Default;
+			}
+			using (var enumerator = that.Skip(startIndex).GetEnumerator()) {
+				while (count-- > 0 && enumerator.MoveNext()) {
+					if (comparer.Equals(value, enumerator.Current)) {
+						return startIndex;
+					}
+					startIndex++;
+				}
+			}
+			return -1;
+		}
+
+		public static int LastIndexOf<T>(this IEnumerable<T> that, T value) {
+			return that.LastIndexOf(value, 0, int.MaxValue, null);
+		}
+
+		public static int LastIndexOf<T>(this IEnumerable<T> that, T value, int startIndex) {
+			return that.LastIndexOf(value, startIndex, int.MaxValue, null);
+		}
+
+		public static int LastIndexOf<T>(this IEnumerable<T> that, T value, int startIndex, int count) {
+			return that.LastIndexOf(value, startIndex, count, null);
+		}
+
+		public static int LastIndexOf<T>(this IEnumerable<T> that, T value, IEqualityComparer<T> comparer) {
+			return that.LastIndexOf(value, 0, int.MaxValue, comparer);
+		}
+
+		public static int LastIndexOf<T>(this IEnumerable<T> that, T value, int startIndex, IEqualityComparer<T> comparer) {
+			return that.LastIndexOf(value, startIndex, int.MaxValue, comparer);
+		}
+
+		public static int LastIndexOf<T>(this IEnumerable<T> that, T value, int startIndex, int count, IEqualityComparer<T> comparer) {
+			if (startIndex < 0) {
+				throw new ArgumentOutOfRangeException(nameof(startIndex));
+			}
+			if (count < 0) {
+				throw new ArgumentOutOfRangeException(nameof(count));
+			}
+			if (comparer == null) {
+				comparer = EqualityComparer<T>.Default;
+			}
+			var result = -1;
+			using (var enumerator = that.Skip(startIndex).GetEnumerator()) {
+				while (count-- > 0 && enumerator.MoveNext()) {
+					if (comparer.Equals(value, enumerator.Current)) {
+						result = startIndex;
+					}
+					startIndex++;
+				}
+			}
+			return result;
+		}
+
 		public static bool InstanceEquals<T>(this T that, object other, Func<T, T, bool> equals)
 				where T: class {
 			if (ReferenceEquals(that, other)) {
