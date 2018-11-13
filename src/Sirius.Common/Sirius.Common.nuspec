@@ -14,8 +14,8 @@
 		<dependencies />
 	</metadata>
 	<files>
-		<file src="bin\$Configuration$\Sirius.Common.dll" target="lib/net461"  />
+		<file src="bin\$Configuration$\Sirius.Common.dll" target="lib/net461" />
 		<file src="bin\$Configuration$\Sirius.Common.pdb" target="lib/net461" />
-		<!--file src="bin\$Configuration$\Sirius.Common.xml" target="lib/net461" /-->
+		<file src="bin\$Configuration$\Sirius.Common.xml" target="lib/net461" />
 	</files>
 </package>

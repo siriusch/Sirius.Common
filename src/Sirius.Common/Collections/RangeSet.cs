@@ -272,6 +272,10 @@ namespace Sirius.Collections {
 			}
 		}
 
+		/// <summary>Gets a value indicating whether this RangeSet&lt;T&gt; is empty.</summary>
+		/// <value><c>true</c> if this RangeSet&lt;T&gt; is empty, <c>false</c> if not.</value>
+		public bool IsEmpty => this.ranges == null;
+
 		/// <summary>Gets the enumerator.</summary>
 		/// <returns>The enumerator.</returns>
 		[Pure]
@@ -333,6 +337,25 @@ namespace Sirius.Collections {
 			}
 		}
 
+		/// <summary>Range slice operation.</summary>
+		/// <param name="slice">The slice range to return.</param>
+		/// <returns>A <see cref="RangeSet{T}" /> representing the slice of the set.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public RangeSet<T> Slice(Range<T> slice) {
+			return RangeOperations<T>.Slice(this, slice);
+		}
+
+		/// <summary>Range slice operation.</summary>
+		/// <param name="from">The lower bound of the slice (inclusive).</param>
+		/// <param name="to">The upper bound of the slice (inclusive).</param>
+		/// <returns>A <see cref="RangeSet{T}" /> representing the slice of the set.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public RangeSet<T> Slice(T from, T to) {
+			return RangeOperations<T>.Slice(this, from, to);
+		}
+
 		/// <summary>Returns the hash code for this instance.</summary>
 		/// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
 		[Pure]
@@ -353,7 +376,7 @@ namespace Sirius.Collections {
 		/// <returns>A <see cref="T:System.String" /> with a textual representation of the ranges in the set.</returns>
 		[Pure]
 		public override string ToString() {
-			return "[" + string.Join(",", this.ranges.Select(r => r.ToString())) + "]";
+			return this.IsEmpty ? "[]" : "[" + string.Join(",", this.ranges.Select(r => r.ToString())) + "]";
 		}
 	}
 }

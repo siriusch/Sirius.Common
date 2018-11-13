@@ -12,7 +12,7 @@ namespace Sirius.Collections {
 			where T: IComparable<T> {
 		/// <summary>Perform a binary search for a specific <paramref name="value" /> in a <seealso cref="IRangeSet{T}" />.</summary>
 		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
-		/// <param name="that">The range set to act on.</param>
+		/// <param name="set">The range set to act on.</param>
 		/// <param name="value">The value to find.</param>
 		/// <returns>
 		///     The index of the range containing the specified <paramref name="value" /> in the <see cref="IRangeSet{T}" />, if
@@ -21,13 +21,13 @@ namespace Sirius.Collections {
 		///     range.
 		/// </returns>
 		[Pure]
-		public static int BinarySearch<TRangeSet>(TRangeSet that, T value)
+		public static int BinarySearch<TRangeSet>(TRangeSet set, T value)
 				where TRangeSet: IRangeSet<T> {
 			var left = 0;
-			var right = that.Count;
+			var right = set.Count;
 			while (left < right) {
 				var middle = (left + right) / 2;
-				var range = that[middle];
+				var range = set[middle];
 				if (value.CompareTo(range.From) < 0) {
 					right = middle;
 				} else if (value.CompareTo(range.To) > 0) {
@@ -285,52 +285,52 @@ namespace Sirius.Collections {
 
 		/// <summary>Range negation operation.</summary>
 		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
-		/// <param name="that">The range set.</param>
-		/// <returns>A <see cref="RangeSet{T}" /> representing the complement of the input <paramref name="that" />.</returns>
-		public static RangeSet<T> Negate<TRangeSet>(TRangeSet that)
+		/// <param name="set">The range set.</param>
+		/// <returns>A <see cref="RangeSet{T}" /> representing the complement of the input <paramref name="set" />.</returns>
+		public static RangeSet<T> Negate<TRangeSet>(TRangeSet set)
 				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(that)) {
+			if (IsEmptySet(set)) {
 				return RangeSet<T>.All;
 			}
-			if (Equals(RangeSet<T>.All, that)) {
+			if (Equals(RangeSet<T>.All, set)) {
 				return RangeSet<T>.Empty;
 			}
-			return new RangeSet<T>(EnumerateRanges(that, RangeSet<T>.All).Where(r => r.Value == ContainedIn.Right).Select(r => r.Key).ToArray());
+			return new RangeSet<T>(EnumerateRanges(set, RangeSet<T>.All).Where(r => r.Value == ContainedIn.Right).Select(r => r.Key).ToArray());
 		}
 
 		/// <summary>Range slice operation.</summary>
 		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
-		/// <param name="that">The range set.</param>
+		/// <param name="set">The range set.</param>
 		/// <param name="slice">The slice range to return.</param>
-		/// <returns>A <see cref="RangeSet{T}" /> representing the slice of the input <paramref name="that" />.</returns>
-		public static RangeSet<T> Slice<TRangeSet>(TRangeSet that, Range<T> slice)
+		/// <returns>A <see cref="RangeSet{T}" /> representing the slice of the input <paramref name="set" />.</returns>
+		public static RangeSet<T> Slice<TRangeSet>(TRangeSet set, Range<T> slice)
 				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(that)) {
+			if (IsEmptySet(set)) {
 				return RangeSet<T>.Empty;
 			}
-			var first = that[0];
-			var last = that[that.Count - 1];
+			var first = set[0];
+			var last = set[set.Count - 1];
 			if ((slice.To.CompareTo(first.From) < 0) || (slice.From.CompareTo(last.To) > 0)) {
 				return RangeSet<T>.Empty;
 			}
 			if ((slice.From.CompareTo(first.From) <= 0) && (slice.To.CompareTo(last.To) >= 0)) {
-				return AsRangeSet(that);
+				return AsRangeSet(set);
 			}
 			if (slice.From.CompareTo(slice.To) == 0) {
-				return BinarySearch(that, slice.From) >= 0 ? slice : RangeSet<T>.Empty;
+				return BinarySearch(set, slice.From) >= 0 ? slice : RangeSet<T>.Empty;
 			}
-			return new RangeSet<T>(EnumerateRanges(that, new RangeSet<T>(slice)).Where(r => r.Value == ContainedIn.Both).Select(r => r.Key).ToArray());
+			return new RangeSet<T>(EnumerateRanges(set, new RangeSet<T>(slice)).Where(r => r.Value == ContainedIn.Both).Select(r => r.Key).ToArray());
 		}
 
 		/// <summary>Range slice operation.</summary>
 		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
-		/// <param name="that">The range set.</param>
+		/// <param name="set">The range set.</param>
 		/// <param name="from">The lower bound of the slice (inclusive).</param>
 		/// <param name="to">The upper bound of the slice (inclusive).</param>
-		/// <returns>A <see cref="RangeSet{T}" /> representing the complement of the input <paramref name="that" />.</returns>
-		public static RangeSet<T> Slice<TRangeSet>(TRangeSet that, T from, T to)
+		/// <returns>A <see cref="RangeSet{T}" /> representing the slice of the input <paramref name="set" />.</returns>
+		public static RangeSet<T> Slice<TRangeSet>(TRangeSet set, T from, T to)
 				where TRangeSet: IRangeSet<T> {
-			return Slice(that, Range<T>.Create(from, to));
+			return Slice(set, Range<T>.Create(from, to));
 		}
 
 		/// <summary>Range union operation.</summary>
