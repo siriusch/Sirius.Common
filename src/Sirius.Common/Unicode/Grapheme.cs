@@ -220,7 +220,7 @@ namespace Sirius.Unicode {
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public int CompareTo(Grapheme other) {
-			return StringComparer.InvariantCulture.Compare(this.Value, other.Value);
+			return StringComparer.Ordinal.Compare(this.Value, other.Value);
 		}
 
 		/// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -229,7 +229,7 @@ namespace Sirius.Unicode {
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public bool Equals(Grapheme other) {
-			return StringComparer.InvariantCulture.Equals(this.Value, other.Value);
+			return StringComparer.Ordinal.Equals(this.Value, other.Value);
 		}
 
 		/// <summary>Returns the hash code for this instance.</summary>
@@ -237,7 +237,7 @@ namespace Sirius.Unicode {
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public override int GetHashCode() {
-			return typeof(Grapheme).GetHashCode()^StringComparer.InvariantCulture.GetHashCode(this.Value);
+			return typeof(Grapheme).GetHashCode()^StringComparer.Ordinal.GetHashCode(this.Value);
 		}
 
 		/// <summary>Indicates whether this instance and a specified object are equal.</summary>
@@ -286,7 +286,7 @@ namespace Sirius.Unicode {
 
 		[Pure]
 		private Grapheme CreateIfDifferent(string value) {
-			if (StringComparer.InvariantCulture.Equals(value, this.Value)) {
+			if (StringComparer.Ordinal.Equals(value, this.Value)) {
 				return this;
 			}
 			return new Grapheme(value, false);
