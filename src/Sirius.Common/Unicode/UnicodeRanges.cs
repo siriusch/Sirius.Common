@@ -7,148 +7,430 @@ using System.Threading;
 using Sirius.Collections;
 
 namespace Sirius.Unicode {
+	/// <summary>Unicode ranges.</summary>
+	/// <remarks>The current implementation contains only BMP codepoints.</remarks>
 	public static class UnicodeRanges {
 		// ReSharper disable IdentifierTypo
 		// ReSharper disable InconsistentNaming
+
+		///<summary>Unicode Letter range.</summary>
 		public static RangeSet<Codepoint> Letter => FromUnicodeName("L");
+
+		///<summary>Unicode LowercaseLetter range.</summary>
 		public static RangeSet<Codepoint> LowercaseLetter => FromUnicodeName("Ll");
+
+		///<summary>Unicode UppercaseLetter range.</summary>
 		public static RangeSet<Codepoint> UppercaseLetter => FromUnicodeName("Lu");
+
+		///<summary>Unicode TitlecaseLetter range.</summary>
 		public static RangeSet<Codepoint> TitlecaseLetter => FromUnicodeName("Lt");
+
+		///<summary>Unicode CasedLetter range.</summary>
 		public static RangeSet<Codepoint> CasedLetter => FromUnicodeName("L&");
+
+		///<summary>Unicode ModifierLetter range.</summary>
 		public static RangeSet<Codepoint> ModifierLetter => FromUnicodeName("Lm");
+
+		///<summary>Unicode OtherLetter range.</summary>
 		public static RangeSet<Codepoint> OtherLetter => FromUnicodeName("Lo");
+
+		///<summary>Unicode Mark range.</summary>
 		public static RangeSet<Codepoint> Mark => FromUnicodeName("M");
+
+		///<summary>Unicode NonSpacingMark range.</summary>
 		public static RangeSet<Codepoint> NonSpacingMark => FromUnicodeName("Mn");
+
+		///<summary>Unicode SpacingCombiningMark range.</summary>
 		public static RangeSet<Codepoint> SpacingCombiningMark => FromUnicodeName("Mc");
+
+		///<summary>Unicode EnclosingMark range.</summary>
 		public static RangeSet<Codepoint> EnclosingMark => FromUnicodeName("Me");
+
+		///<summary>Unicode Separator range.</summary>
 		public static RangeSet<Codepoint> Separator => FromUnicodeName("Z");
+
+		///<summary>Unicode SpaceSeparator range.</summary>
 		public static RangeSet<Codepoint> SpaceSeparator => FromUnicodeName("Zs");
+
+		///<summary>Unicode LineSeparator range.</summary>
 		public static RangeSet<Codepoint> LineSeparator => FromUnicodeName("Zl");
+
+		///<summary>Unicode ParagraphSeparator range.</summary>
 		public static RangeSet<Codepoint> ParagraphSeparator => FromUnicodeName("Zp");
+
+		///<summary>Unicode Symbol range.</summary>
 		public static RangeSet<Codepoint> Symbol => FromUnicodeName("S");
+
+		///<summary>Unicode MathSymbol range.</summary>
 		public static RangeSet<Codepoint> MathSymbol => FromUnicodeName("Sm");
+
+		///<summary>Unicode CurrencySymbol range.</summary>
 		public static RangeSet<Codepoint> CurrencySymbol => FromUnicodeName("Sc");
+
+		///<summary>Unicode ModifierSymbol range.</summary>
 		public static RangeSet<Codepoint> ModifierSymbol => FromUnicodeName("Sk");
+
+		///<summary>Unicode OtherSymbol range.</summary>
 		public static RangeSet<Codepoint> OtherSymbol => FromUnicodeName("So");
+
+		///<summary>Unicode Number range.</summary>
 		public static RangeSet<Codepoint> Number => FromUnicodeName("N");
+
+		///<summary>Unicode DecimalDigitNumber range.</summary>
 		public static RangeSet<Codepoint> DecimalDigitNumber => FromUnicodeName("Nd");
+
+		///<summary>Unicode LetterNumber range.</summary>
 		public static RangeSet<Codepoint> LetterNumber => FromUnicodeName("Nl");
+
+		///<summary>Unicode OtherNumber range.</summary>
 		public static RangeSet<Codepoint> OtherNumber => FromUnicodeName("No");
+
+		///<summary>Unicode Punctuation range.</summary>
 		public static RangeSet<Codepoint> Punctuation => FromUnicodeName("P");
+
+		///<summary>Unicode DashPunctuation range.</summary>
 		public static RangeSet<Codepoint> DashPunctuation => FromUnicodeName("Pd");
+
+		///<summary>Unicode OpenPunctuation range.</summary>
 		public static RangeSet<Codepoint> OpenPunctuation => FromUnicodeName("Ps");
+
+		///<summary>Unicode ClosePunctuation range.</summary>
 		public static RangeSet<Codepoint> ClosePunctuation => FromUnicodeName("Pe");
+
+		///<summary>Unicode InitialPunctuation range.</summary>
 		public static RangeSet<Codepoint> InitialPunctuation => FromUnicodeName("Pi");
+
+		///<summary>Unicode FinalPunctuation range.</summary>
 		public static RangeSet<Codepoint> FinalPunctuation => FromUnicodeName("Pf");
+
+		///<summary>Unicode ConnectorPunctuation range.</summary>
 		public static RangeSet<Codepoint> ConnectorPunctuation => FromUnicodeName("Pc");
+
+		///<summary>Unicode OtherPunctuation range.</summary>
 		public static RangeSet<Codepoint> OtherPunctuation => FromUnicodeName("Po");
+
+		///<summary>Unicode Other range.</summary>
 		public static RangeSet<Codepoint> Other => FromUnicodeName("C");
+
+		///<summary>Unicode Control range.</summary>
 		public static RangeSet<Codepoint> Control => FromUnicodeName("Cc");
+
+		///<summary>Unicode Format range.</summary>
 		public static RangeSet<Codepoint> Format => FromUnicodeName("Cf");
+
+		///<summary>Unicode PrivateUse range.</summary>
 		public static RangeSet<Codepoint> PrivateUse => FromUnicodeName("Co");
+
+		///<summary>Unicode Surrogate range.</summary>
 		public static RangeSet<Codepoint> Surrogate => FromUnicodeName("Cs");
+
+		///<summary>Unicode Unassigned range.</summary>
 		public static RangeSet<Codepoint> Unassigned => FromUnicodeName("Cn");
+
+		///<summary>Unicode InBasicLatin range.</summary>
 		public static RangeSet<Codepoint> InBasicLatin => FromUnicodeName("InBasic_Latin");
+
+		///<summary>Unicode InLatin1Supplement range.</summary>
 		public static RangeSet<Codepoint> InLatin1Supplement => FromUnicodeName("InLatin-1_Supplement");
+
+		///<summary>Unicode InLatinExtendedA range.</summary>
 		public static RangeSet<Codepoint> InLatinExtendedA => FromUnicodeName("InLatin_Extended-A");
+
+		///<summary>Unicode InLatinExtendedB range.</summary>
 		public static RangeSet<Codepoint> InLatinExtendedB => FromUnicodeName("InLatin_Extended-B");
+
+		///<summary>Unicode InIPAExtensions range.</summary>
 		public static RangeSet<Codepoint> InIPAExtensions => FromUnicodeName("InIPA_Extensions");
+
+		///<summary>Unicode InSpacingModifierLetters range.</summary>
 		public static RangeSet<Codepoint> InSpacingModifierLetters => FromUnicodeName("InSpacing_Modifier_Letters");
+
+		///<summary>Unicode InCombiningDiacriticalMarks range.</summary>
 		public static RangeSet<Codepoint> InCombiningDiacriticalMarks => FromUnicodeName("InCombining_Diacritical_Marks");
+
+		///<summary>Unicode InGreekandCoptic range.</summary>
 		public static RangeSet<Codepoint> InGreekandCoptic => FromUnicodeName("InGreek_and_Coptic");
+
+		///<summary>Unicode InCyrillic range.</summary>
 		public static RangeSet<Codepoint> InCyrillic => FromUnicodeName("InCyrillic");
+
+		///<summary>Unicode InCyrillicSupplementary range.</summary>
 		public static RangeSet<Codepoint> InCyrillicSupplementary => FromUnicodeName("InCyrillic_Supplementary");
+
+		///<summary>Unicode InArmenian range.</summary>
 		public static RangeSet<Codepoint> InArmenian => FromUnicodeName("InArmenian");
+
+		///<summary>Unicode InHebrew range.</summary>
 		public static RangeSet<Codepoint> InHebrew => FromUnicodeName("InHebrew");
+
+		///<summary>Unicode InArabic range.</summary>
 		public static RangeSet<Codepoint> InArabic => FromUnicodeName("InArabic");
+
+		///<summary>Unicode InSyriac range.</summary>
 		public static RangeSet<Codepoint> InSyriac => FromUnicodeName("InSyriac");
+
+		///<summary>Unicode InThaana range.</summary>
 		public static RangeSet<Codepoint> InThaana => FromUnicodeName("InThaana");
+
+		///<summary>Unicode InDevanagari range.</summary>
 		public static RangeSet<Codepoint> InDevanagari => FromUnicodeName("InDevanagari");
+
+		///<summary>Unicode InBengali range.</summary>
 		public static RangeSet<Codepoint> InBengali => FromUnicodeName("InBengali");
+
+		///<summary>Unicode InGurmukhi range.</summary>
 		public static RangeSet<Codepoint> InGurmukhi => FromUnicodeName("InGurmukhi");
+
+		///<summary>Unicode InGujarati range.</summary>
 		public static RangeSet<Codepoint> InGujarati => FromUnicodeName("InGujarati");
+
+		///<summary>Unicode InOriya range.</summary>
 		public static RangeSet<Codepoint> InOriya => FromUnicodeName("InOriya");
+
+		///<summary>Unicode InTamil range.</summary>
 		public static RangeSet<Codepoint> InTamil => FromUnicodeName("InTamil");
+
+		///<summary>Unicode InTelugu range.</summary>
 		public static RangeSet<Codepoint> InTelugu => FromUnicodeName("InTelugu");
+
+		///<summary>Unicode InKannada range.</summary>
 		public static RangeSet<Codepoint> InKannada => FromUnicodeName("InKannada");
+
+		///<summary>Unicode InMalayalam range.</summary>
 		public static RangeSet<Codepoint> InMalayalam => FromUnicodeName("InMalayalam");
+
+		///<summary>Unicode InSinhala range.</summary>
 		public static RangeSet<Codepoint> InSinhala => FromUnicodeName("InSinhala");
+
+		///<summary>Unicode InThai range.</summary>
 		public static RangeSet<Codepoint> InThai => FromUnicodeName("InThai");
+
+		///<summary>Unicode InLao range.</summary>
 		public static RangeSet<Codepoint> InLao => FromUnicodeName("InLao");
+
+		///<summary>Unicode InTibetan range.</summary>
 		public static RangeSet<Codepoint> InTibetan => FromUnicodeName("InTibetan");
+
+		///<summary>Unicode InMyanmar range.</summary>
 		public static RangeSet<Codepoint> InMyanmar => FromUnicodeName("InMyanmar");
+
+		///<summary>Unicode InGeorgian range.</summary>
 		public static RangeSet<Codepoint> InGeorgian => FromUnicodeName("InGeorgian");
+
+		///<summary>Unicode InHangulJamo range.</summary>
 		public static RangeSet<Codepoint> InHangulJamo => FromUnicodeName("InHangul_Jamo");
+
+		///<summary>Unicode InEthiopic range.</summary>
 		public static RangeSet<Codepoint> InEthiopic => FromUnicodeName("InEthiopic");
+
+		///<summary>Unicode InCherokee range.</summary>
 		public static RangeSet<Codepoint> InCherokee => FromUnicodeName("InCherokee");
+
+		///<summary>Unicode InUnifiedCanadianAboriginalSyllabics range.</summary>
 		public static RangeSet<Codepoint> InUnifiedCanadianAboriginalSyllabics => FromUnicodeName("InUnified_Canadian_Aboriginal_Syllabics");
+
+		///<summary>Unicode InOgham range.</summary>
 		public static RangeSet<Codepoint> InOgham => FromUnicodeName("InOgham");
+
+		///<summary>Unicode InRunic range.</summary>
 		public static RangeSet<Codepoint> InRunic => FromUnicodeName("InRunic");
+
+		///<summary>Unicode InTagalog range.</summary>
 		public static RangeSet<Codepoint> InTagalog => FromUnicodeName("InTagalog");
+
+		///<summary>Unicode InHanunoo range.</summary>
 		public static RangeSet<Codepoint> InHanunoo => FromUnicodeName("InHanunoo");
+
+		///<summary>Unicode InBuhid range.</summary>
 		public static RangeSet<Codepoint> InBuhid => FromUnicodeName("InBuhid");
+
+		///<summary>Unicode InTagbanwa range.</summary>
 		public static RangeSet<Codepoint> InTagbanwa => FromUnicodeName("InTagbanwa");
+
+		///<summary>Unicode InKhmer range.</summary>
 		public static RangeSet<Codepoint> InKhmer => FromUnicodeName("InKhmer");
+
+		///<summary>Unicode InMongolian range.</summary>
 		public static RangeSet<Codepoint> InMongolian => FromUnicodeName("InMongolian");
+
+		///<summary>Unicode InLimbu range.</summary>
 		public static RangeSet<Codepoint> InLimbu => FromUnicodeName("InLimbu");
+
+		///<summary>Unicode InTaiLe range.</summary>
 		public static RangeSet<Codepoint> InTaiLe => FromUnicodeName("InTai_Le");
+
+		///<summary>Unicode InKhmerSymbols range.</summary>
 		public static RangeSet<Codepoint> InKhmerSymbols => FromUnicodeName("InKhmer_Symbols");
+
+		///<summary>Unicode InPhoneticExtensions range.</summary>
 		public static RangeSet<Codepoint> InPhoneticExtensions => FromUnicodeName("InPhonetic_Extensions");
+
+		///<summary>Unicode InLatinExtendedAdditional range.</summary>
 		public static RangeSet<Codepoint> InLatinExtendedAdditional => FromUnicodeName("InLatin_Extended_Additional");
+
+		///<summary>Unicode InGreekExtended range.</summary>
 		public static RangeSet<Codepoint> InGreekExtended => FromUnicodeName("InGreek_Extended");
+
+		///<summary>Unicode InGeneralPunctuation range.</summary>
 		public static RangeSet<Codepoint> InGeneralPunctuation => FromUnicodeName("InGeneral_Punctuation");
+
+		///<summary>Unicode InSuperscriptsandSubscripts range.</summary>
 		public static RangeSet<Codepoint> InSuperscriptsandSubscripts => FromUnicodeName("InSuperscripts_and_Subscripts");
+
+		///<summary>Unicode InCurrencySymbols range.</summary>
 		public static RangeSet<Codepoint> InCurrencySymbols => FromUnicodeName("InCurrency_Symbols");
+
+		///<summary>Unicode InCombiningDiacriticalMarksforSymbols range.</summary>
 		public static RangeSet<Codepoint> InCombiningDiacriticalMarksforSymbols => FromUnicodeName("InCombining_Diacritical_Marks_for_Symbols");
+
+		///<summary>Unicode InLetterlikeSymbols range.</summary>
 		public static RangeSet<Codepoint> InLetterlikeSymbols => FromUnicodeName("InLetterlike_Symbols");
+
+		///<summary>Unicode InNumberForms range.</summary>
 		public static RangeSet<Codepoint> InNumberForms => FromUnicodeName("InNumber_Forms");
+
+		///<summary>Unicode InArrows range.</summary>
 		public static RangeSet<Codepoint> InArrows => FromUnicodeName("InArrows");
+
+		///<summary>Unicode InMathematicalOperators range.</summary>
 		public static RangeSet<Codepoint> InMathematicalOperators => FromUnicodeName("InMathematical_Operators");
+
+		///<summary>Unicode InMiscellaneousTechnical range.</summary>
 		public static RangeSet<Codepoint> InMiscellaneousTechnical => FromUnicodeName("InMiscellaneous_Technical");
+
+		///<summary>Unicode InControlPictures range.</summary>
 		public static RangeSet<Codepoint> InControlPictures => FromUnicodeName("InControl_Pictures");
+
+		///<summary>Unicode InOpticalCharacterRecognition range.</summary>
 		public static RangeSet<Codepoint> InOpticalCharacterRecognition => FromUnicodeName("InOptical_Character_Recognition");
+
+		///<summary>Unicode InEnclosedAlphanumerics range.</summary>
 		public static RangeSet<Codepoint> InEnclosedAlphanumerics => FromUnicodeName("InEnclosed_Alphanumerics");
+
+		///<summary>Unicode InBoxDrawing range.</summary>
 		public static RangeSet<Codepoint> InBoxDrawing => FromUnicodeName("InBox_Drawing");
+
+		///<summary>Unicode InBlockElements range.</summary>
 		public static RangeSet<Codepoint> InBlockElements => FromUnicodeName("InBlock_Elements");
+
+		///<summary>Unicode InGeometricShapes range.</summary>
 		public static RangeSet<Codepoint> InGeometricShapes => FromUnicodeName("InGeometric_Shapes");
+
+		///<summary>Unicode InMiscellaneousSymbols range.</summary>
 		public static RangeSet<Codepoint> InMiscellaneousSymbols => FromUnicodeName("InMiscellaneous_Symbols");
+
+		///<summary>Unicode InDingbats range.</summary>
 		public static RangeSet<Codepoint> InDingbats => FromUnicodeName("InDingbats");
+
+		///<summary>Unicode InMiscellaneousMathematicalSymbolsA range.</summary>
 		public static RangeSet<Codepoint> InMiscellaneousMathematicalSymbolsA => FromUnicodeName("InMiscellaneous_Mathematical_Symbols-A");
+
+		///<summary>Unicode InSupplementalArrowsA range.</summary>
 		public static RangeSet<Codepoint> InSupplementalArrowsA => FromUnicodeName("InSupplemental_Arrows-A");
+
+		///<summary>Unicode InBraillePatterns range.</summary>
 		public static RangeSet<Codepoint> InBraillePatterns => FromUnicodeName("InBraille_Patterns");
+
+		///<summary>Unicode InSupplementalArrowsB range.</summary>
 		public static RangeSet<Codepoint> InSupplementalArrowsB => FromUnicodeName("InSupplemental_Arrows-B");
+
+		///<summary>Unicode InMiscellaneousMathematicalSymbolsB range.</summary>
 		public static RangeSet<Codepoint> InMiscellaneousMathematicalSymbolsB => FromUnicodeName("InMiscellaneous_Mathematical_Symbols-B");
+
+		///<summary>Unicode InSupplementalMathematicalOperators range.</summary>
 		public static RangeSet<Codepoint> InSupplementalMathematicalOperators => FromUnicodeName("InSupplemental_Mathematical_Operators");
+
+		///<summary>Unicode InMiscellaneousSymbolsandArrows range.</summary>
 		public static RangeSet<Codepoint> InMiscellaneousSymbolsandArrows => FromUnicodeName("InMiscellaneous_Symbols_and_Arrows");
+
+		///<summary>Unicode InCJKRadicalsSupplement range.</summary>
 		public static RangeSet<Codepoint> InCJKRadicalsSupplement => FromUnicodeName("InCJK_Radicals_Supplement");
+
+		///<summary>Unicode InKangxiRadicals range.</summary>
 		public static RangeSet<Codepoint> InKangxiRadicals => FromUnicodeName("InKangxi_Radicals");
+
+		///<summary>Unicode InIdeographicDescriptionCharacters range.</summary>
 		public static RangeSet<Codepoint> InIdeographicDescriptionCharacters => FromUnicodeName("InIdeographic_Description_Characters");
+
+		///<summary>Unicode InCJKSymbolsandPunctuation range.</summary>
 		public static RangeSet<Codepoint> InCJKSymbolsandPunctuation => FromUnicodeName("InCJK_Symbols_and_Punctuation");
+
+		///<summary>Unicode InHiragana range.</summary>
 		public static RangeSet<Codepoint> InHiragana => FromUnicodeName("InHiragana");
+
+		///<summary>Unicode InKatakana range.</summary>
 		public static RangeSet<Codepoint> InKatakana => FromUnicodeName("InKatakana");
+
+		///<summary>Unicode InBopomofo range.</summary>
 		public static RangeSet<Codepoint> InBopomofo => FromUnicodeName("InBopomofo");
+
+		///<summary>Unicode InHangulCompatibilityJamo range.</summary>
 		public static RangeSet<Codepoint> InHangulCompatibilityJamo => FromUnicodeName("InHangul_Compatibility_Jamo");
+
+		///<summary>Unicode InKanbun range.</summary>
 		public static RangeSet<Codepoint> InKanbun => FromUnicodeName("InKanbun");
+
+		///<summary>Unicode InBopomofoExtended range.</summary>
 		public static RangeSet<Codepoint> InBopomofoExtended => FromUnicodeName("InBopomofo_Extended");
+
+		///<summary>Unicode InKatakanaPhoneticExtensions range.</summary>
 		public static RangeSet<Codepoint> InKatakanaPhoneticExtensions => FromUnicodeName("InKatakana_Phonetic_Extensions");
+
+		///<summary>Unicode InEnclosedCJKLettersandMonths range.</summary>
 		public static RangeSet<Codepoint> InEnclosedCJKLettersandMonths => FromUnicodeName("InEnclosed_CJK_Letters_and_Months");
+
+		///<summary>Unicode InCJKCompatibility range.</summary>
 		public static RangeSet<Codepoint> InCJKCompatibility => FromUnicodeName("InCJK_Compatibility");
+
+		///<summary>Unicode InCJKUnifiedIdeographsExtensionA range.</summary>
 		public static RangeSet<Codepoint> InCJKUnifiedIdeographsExtensionA => FromUnicodeName("InCJK_Unified_Ideographs_Extension_A");
+
+		///<summary>Unicode InYijingHexagramSymbols range.</summary>
 		public static RangeSet<Codepoint> InYijingHexagramSymbols => FromUnicodeName("InYijing_Hexagram_Symbols");
+
+		///<summary>Unicode InCJKUnifiedIdeographs range.</summary>
 		public static RangeSet<Codepoint> InCJKUnifiedIdeographs => FromUnicodeName("InCJK_Unified_Ideographs");
+
+		///<summary>Unicode InYiSyllables range.</summary>
 		public static RangeSet<Codepoint> InYiSyllables => FromUnicodeName("InYi_Syllables");
+
+		///<summary>Unicode InYiRadicals range.</summary>
 		public static RangeSet<Codepoint> InYiRadicals => FromUnicodeName("InYi_Radicals");
+
+		///<summary>Unicode InHangulSyllables range.</summary>
 		public static RangeSet<Codepoint> InHangulSyllables => FromUnicodeName("InHangul_Syllables");
+
+		///<summary>Unicode InPrivateUseArea range.</summary>
 		public static RangeSet<Codepoint> InPrivateUseArea => FromUnicodeName("InPrivate_Use_Area");
+
+		///<summary>Unicode InCJKCompatibilityIdeographs range.</summary>
 		public static RangeSet<Codepoint> InCJKCompatibilityIdeographs => FromUnicodeName("InCJK_Compatibility_Ideographs");
+
+		///<summary>Unicode InAlphabeticPresentationForms range.</summary>
 		public static RangeSet<Codepoint> InAlphabeticPresentationForms => FromUnicodeName("InAlphabetic_Presentation_Forms");
+
+		///<summary>Unicode InArabicPresentationFormsA range.</summary>
 		public static RangeSet<Codepoint> InArabicPresentationFormsA => FromUnicodeName("InArabic_Presentation_Forms-A");
+
+		///<summary>Unicode InVariationSelectors range.</summary>
 		public static RangeSet<Codepoint> InVariationSelectors => FromUnicodeName("InVariation_Selectors");
+
+		///<summary>Unicode InCombiningHalfMarks range.</summary>
 		public static RangeSet<Codepoint> InCombiningHalfMarks => FromUnicodeName("InCombining_Half_Marks");
+
+		///<summary>Unicode InCJKCompatibilityForms range.</summary>
 		public static RangeSet<Codepoint> InCJKCompatibilityForms => FromUnicodeName("InCJK_Compatibility_Forms");
+
+		///<summary>Unicode InSmallFormVariants range.</summary>
 		public static RangeSet<Codepoint> InSmallFormVariants => FromUnicodeName("InSmall_Form_Variants");
+
+		///<summary>Unicode InArabicPresentationFormsB range.</summary>
 		public static RangeSet<Codepoint> InArabicPresentationFormsB => FromUnicodeName("InArabic_Presentation_Forms-B");
+
+		///<summary>Unicode InHalfwidthandFullwidthForms range.</summary>
 		public static RangeSet<Codepoint> InHalfwidthandFullwidthForms => FromUnicodeName("InHalfwidth_and_Fullwidth_Forms");
+
+		///<summary>Unicode InSpecials range.</summary>
 		public static RangeSet<Codepoint> InSpecials => FromUnicodeName("InSpecials");
 		// ReSharper restore InconsistentNaming
 
@@ -345,17 +627,23 @@ namespace Sirius.Unicode {
 		};
 		// ReSharper restore IdentifierTypo
 
+		/// <summary>Gets a Unicode range by <see cref="UnicodeCategory"/>.</summary>
+		/// <param name="category">The category.</param>
+		/// <returns>A range set of codepoints.</returns>
 		public static RangeSet<Codepoint> FromUnicodeCategory(UnicodeCategory category) {
 			return charSetByCategory.Value[category];
 		}
 
+		/// <summary>Gets a Unicode range by name.</summary>
+		/// <param name="name">The name.</param>
+		/// <returns>A range set of codepoints.</returns>
 		public static RangeSet<Codepoint> FromUnicodeName(string name) {
 			lock (charSetByName) {
 				if (!charSetByName.TryGetValue(name, out var result)) {
 					if (!categoriesByName.TryGetValue(name, out var categories)) {
 						throw new ArgumentException(string.Format("Unknown unicode name '{0}'", name), "name");
 					}
-					result = RangeSet<Codepoint>.Union(categories.Select(FromUnicodeCategory));
+					result = RangeOperations<Codepoint>.Union(categories.Select(FromUnicodeCategory));
 					charSetByName.Add(name, result);
 				}
 				return result;

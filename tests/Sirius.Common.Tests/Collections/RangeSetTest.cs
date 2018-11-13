@@ -23,7 +23,7 @@ namespace Sirius.Collections {
 			RangeSet<char> set1 = range1;
 			var range2 = Range<char>.Create(from2, to2);
 			RangeSet<char> set2 = range2;
-			Assert.Equal(expected, RangeSet<char>.Difference(set1, set2).Expand());
+			Assert.Equal(expected, RangeOperations<char>.Difference(set1, set2).Expand());
 			Assert.Equal(expected, (set1 ^ set2).Expand());
 			Assert.Equal(expected, (range1 ^ range2).Expand());
 			Assert.Equal(expected, (set1 ^ range2).Expand());
@@ -41,7 +41,7 @@ namespace Sirius.Collections {
 			RangeSet<char> set1 = range1;
 			var range2 = Range<char>.Create(from2, to2);
 			RangeSet<char> set2 = range2;
-			Assert.Equal(expected, RangeSet<char>.Intersection(set1, set2).Expand());
+			Assert.Equal(expected, RangeOperations<char>.Intersection(set1, set2).Expand());
 			Assert.Equal(expected, (set1 & set2).Expand());
 			Assert.Equal(expected, (range1 & range2).Expand());
 			Assert.Equal(expected, (set1 & range2).Expand());
@@ -58,7 +58,7 @@ namespace Sirius.Collections {
 			var range1 = Range<char>.Create(from1, to1);
 			var range2 = Range<char>.Create(from2, to2);
 			RangeSet<char> positive = new[] {range1, range2};
-			var negative = RangeSet<char>.Negate(positive);
+			var negative = RangeOperations<char>.Negate(positive);
 			this.output.WriteLine(string.Join(", ", positive.Expand()));
 			this.output.WriteLine(negative.Expand().Count().ToString());
 			Assert.NotEqual(positive, negative);
@@ -67,7 +67,7 @@ namespace Sirius.Collections {
 			Assert.Equal(RangeSet<char>.Empty, positive & negative);
 			Assert.Equal(positive, positive - negative);
 			Assert.Equal(negative, negative - positive);
-			RangeSet<char> negative2 = (range1 == range2) ? ~range1 : ~positive;
+			var negative2 = (range1 == range2) ? ~range1 : ~positive;
 			Assert.Equal(negative, negative2);
 		}
 
@@ -83,7 +83,7 @@ namespace Sirius.Collections {
 			RangeSet<char> set1 = range1;
 			var range2 = Range<char>.Create(from2, to2);
 			RangeSet<char> set2 = range2;
-			Assert.Equal(expected, RangeSet<char>.Subtract(set1, set2).Expand());
+			Assert.Equal(expected, RangeOperations<char>.Subtract(set1, set2).Expand());
 			Assert.Equal(expected, (set1 - set2).Expand());
 			Assert.Equal(expected, (range1 - range2).Expand());
 			Assert.Equal(expected, (set1 - range2).Expand());
@@ -101,7 +101,7 @@ namespace Sirius.Collections {
 			RangeSet<char> set1 = range1;
 			var range2 = Range<char>.Create(from2, to2);
 			RangeSet<char> set2 = range2;
-			Assert.Equal(expected, RangeSet<char>.Union(set1, set2).Expand());
+			Assert.Equal(expected, RangeOperations<char>.Union(set1, set2).Expand());
 			Assert.Equal(expected, new RangeSet<char>((IEnumerable<Range<char>>)(new[] {range1, range2})).Expand());
 			Assert.Equal(expected, (set1 | set2).Expand());
 			Assert.Equal(expected, (range1 | range2).Expand());

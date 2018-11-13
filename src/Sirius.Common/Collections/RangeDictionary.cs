@@ -1,13 +1,17 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Sirius.Collections {
-	public class RangeDictionary<TKey, TValue>: IEquatable<RangeDictionary<TKey, TValue>>, IEnumerable<KeyValuePair<Range<TKey>, TValue>>
+	/// <summary>A key-value dictionary where the keys are treated as normalized range sets.</summary>
+	/// <typeparam name="TKey">Type of the key.</typeparam>
+	/// <typeparam name="TValue">Type of the value.</typeparam>
+	public class RangeDictionary<TKey, TValue>: IEnumerable<KeyValuePair<Range<TKey>, TValue>>
 			where TKey: IComparable<TKey> {
-		private class KeySet: IRangeSet<TKey> {
+		private sealed class KeySet: IRangeSet<TKey> {
 			private readonly IReadOnlyList<KeyValuePair<Range<TKey>, TValue>> items;
 
 			public KeySet(IReadOnlyList<KeyValuePair<Range<TKey>, TValue>> items) {
@@ -19,7 +23,7 @@ namespace Sirius.Collections {
 			}
 
 			IEnumerator IEnumerable.GetEnumerator() {
-				return GetEnumerator();
+				return this.GetEnumerator();
 			}
 
 			public int Count => this.items.Count;
@@ -27,7 +31,7 @@ namespace Sirius.Collections {
 			public Range<TKey> this[int index] => this.items[index].Key;
 		}
 
-		private class ValueList: IReadWriteList<TValue>, IReadOnlyList<TValue> {
+		private sealed class ValueList: IList<TValue> {
 			private readonly IList<KeyValuePair<Range<TKey>, TValue>> items;
 
 			public ValueList(IList<KeyValuePair<Range<TKey>, TValue>> items) {
@@ -39,10 +43,44 @@ namespace Sirius.Collections {
 			}
 
 			IEnumerator IEnumerable.GetEnumerator() {
-				return GetEnumerator();
+				return this.GetEnumerator();
+			}
+
+			public void Add(TValue item) {
+				throw new NotSupportedException();
+			}
+
+			public void Clear() {
+				throw new NotSupportedException();
+			}
+
+			public bool Contains(TValue item) {
+				throw new NotImplementedException();
+			}
+
+			public void CopyTo(TValue[] array, int arrayIndex) {
+				throw new NotImplementedException();
+			}
+
+			public bool Remove(TValue item) {
+				throw new NotSupportedException();
 			}
 
 			public int Count => this.items.Count;
+
+			public bool IsReadOnly => false;
+
+			public int IndexOf(TValue item) {
+				return this.items.Select(i => i.Value).IndexOf(item);
+			}
+
+			public void Insert(int index, TValue item) {
+				throw new NotSupportedException();
+			}
+
+			public void RemoveAt(int index) {
+				throw new NotSupportedException();
+			}
 
 			public TValue this[int index] {
 				get {
@@ -54,51 +92,111 @@ namespace Sirius.Collections {
 			}
 		}
 
-		public static bool operator ==(RangeDictionary<TKey, TValue> left, RangeDictionary<TKey, TValue> right) {
-			return Equals(left, right);
-		}
-
-		public static bool operator !=(RangeDictionary<TKey, TValue> left, RangeDictionary<TKey, TValue> right) {
-			return !Equals(left, right);
-		}
-
 		private readonly List<KeyValuePair<Range<TKey>, TValue>> items = new List<KeyValuePair<Range<TKey>, TValue>>();
 
 		private readonly IEqualityComparer<TValue> valueEqualityComparer;
 
+		/// <summary>Creates a new <see cref="RangeDictionary{TKey,TValue}" />.</summary>
 		public RangeDictionary(): this(EqualityComparer<TValue>.Default) { }
 
+		/// <summary>Creates a new <see cref="RangeDictionary{TKey,TValue}" />.</summary>
+		/// <param name="valueEqualityComparer">The value equality comparer.</param>
+		/// <remarks>The value equality comparer is used to determine if adjacent ranges can be merged.</remarks>
 		public RangeDictionary(IEqualityComparer<TValue> valueEqualityComparer) {
-			this.valueEqualityComparer = valueEqualityComparer;
+			this.valueEqualityComparer = valueEqualityComparer ?? EqualityComparer<TValue>.Default;
 			this.Keys = new KeySet(this.items);
 			this.Values = new ValueList(this.items);
 		}
 
+		/// <summary>Creates a new <see cref="RangeDictionary{TKey,TValue}" />.</summary>
+		/// <param name="items">The items to initially add.</param>
 		public RangeDictionary(IEnumerable<KeyValuePair<Range<TKey>, TValue>> items): this(items, EqualityComparer<TValue>.Default) { }
 
+		/// <summary>Creates a new <see cref="RangeDictionary{TKey,TValue}" />.</summary>
+		/// <param name="items">The items to initially add.</param>
+		/// <param name="valueEqualityComparer">The value equality comparer.</param>
+		/// <remarks>The value equality comparer is used to determine if adjacent ranges can be merged.</remarks>
 		public RangeDictionary(IEnumerable<KeyValuePair<Range<TKey>, TValue>> items, IEqualityComparer<TValue> valueEqualityComparer): this(valueEqualityComparer) {
 			foreach (var item in items) {
-				Add(item.Key, item.Value);
+				this.Add(item.Key, item.Value);
 			}
 		}
 
+		/// <summary>Gets the value equality comparer.</summary>
+		/// <value>The value comparer.</value>
+		/// <remarks>The value equality comparer is used to determine if adjacent ranges can be merged.</remarks>
+		public IEqualityComparer<TValue> ValueComparer => this.valueEqualityComparer;
+
+		/// <summary>Gets the keys as <see cref="IRangeSet{T}" />.</summary>
+		/// <value>The keys.</value>
 		public IRangeSet<TKey> Keys {
 			get;
 		}
 
-		public IReadWriteList<TValue> Values {
+		/// <summary>Gets the values.</summary>
+		/// <value>The values.</value>
+		/// <remarks>
+		///     The list cannot change in size, but items can be accessed and set by index. Setting an item replaces the value
+		///     for the whole range at the given index.
+		/// </remarks>
+		public IList<TValue> Values {
 			get;
 		}
 
+		/// <summary>Returns an enumerator that iterates through the collection.</summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		[Pure]
 		public IEnumerator<KeyValuePair<Range<TKey>, TValue>> GetEnumerator() {
 			return this.items.GetEnumerator();
 		}
 
+		[Pure]
 		IEnumerator IEnumerable.GetEnumerator() {
-			return GetEnumerator();
+			return this.GetEnumerator();
 		}
 
-		public bool Equals(RangeDictionary<TKey, TValue> other) {
+		/// <summary>Adds a new value wt the specified key.</summary>
+		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
+		/// <param name="key">The key.</param>
+		/// <param name="value">The value.</param>
+		/// <remarks>This operation takes O(log n) time, where n is the number of range key and value pairs)</remarks>
+		public void Add(TKey key, TValue value) {
+			this.Add(new Range<TKey>(key, key), value);
+		}
+
+		/// <summary>Adds a new value wt the specified key range.</summary>
+		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
+		/// <param name="from">The lower bound of the range (inclusive).</param>
+		/// <param name="to">The upper bound of the range (inclusive).</param>
+		/// <param name="value">The value.</param>
+		/// <remarks>This operation takes O(log n) time, where n is the number of range key and value pairs)</remarks>
+		public void Add(TKey from, TKey to, TValue value) {
+			this.Add(new Range<TKey>(from, to), value);
+		}
+
+		/// <summary>Adds a new value wt the specified key range.</summary>
+		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
+		/// <param name="range">The key range.</param>
+		/// <param name="value">The value.</param>
+		/// <remarks>This operation takes O(log n) time, where n is the number of range key and value pairs)</remarks>
+		public void Add(Range<TKey> range, TValue value) {
+			var left = ~RangeOperations<TKey>.BinarySearch(this.Keys, range.From);
+			var right = ~RangeOperations<TKey>.BinarySearch(this.Keys, range.To);
+			if ((left < 0) || (right < 0) || (left != right)) {
+				throw new ArgumentOutOfRangeException(nameof(range), "The range overlaps an existing range");
+			}
+			this.items.Insert(left, new KeyValuePair<Range<TKey>, TValue>(range, value));
+			this.MergeIfAdjacent(left, left + 1);
+			this.MergeIfAdjacent(left - 1, left);
+		}
+
+		/// <summary>Compares the content of the <see cref="RangeDictionary{TKey,TValue}" />.</summary>
+		/// <remarks>This operation runs in O(n) time (worst), where n is the number of range key and value pairs)</remarks>
+		/// <param name="other">The other <see cref="RangeDictionary{TKey,TValue}" />.</param>
+		/// <param name="valueEqualityComparer">(Optional) The value equality comparer.</param>
+		/// <returns><c>true</c> if it succeeds, <c>false</c> if it fails.</returns>
+		[Pure]
+		public bool ContentEquals(RangeDictionary<TKey, TValue> other, IEqualityComparer<TValue> valueEqualityComparer = null) {
 			if (ReferenceEquals(null, other)) {
 				return false;
 			}
@@ -108,58 +206,35 @@ namespace Sirius.Collections {
 			if (this.items.Count != other.items.Count) {
 				return false;
 			}
+			if (valueEqualityComparer == null) {
+				valueEqualityComparer = this.valueEqualityComparer;
+			}
 			for (var i = 0; i < this.items.Count; i++) {
 				var x = this.items[i];
 				var y = other.items[i];
-				if (!x.Key.Equals(y.Key) || !this.valueEqualityComparer.Equals(x.Value, y.Value)) {
+				if (!x.Key.Equals(y.Key) || !valueEqualityComparer.Equals(x.Value, y.Value)) {
 					return false;
 				}
 			}
 			return true;
 		}
 
-		public void Add(TKey key, TValue value) {
-			Add(new Range<TKey>(key, key), value);
-		}
-
-		public void Add(TKey from, TKey to, TValue value) {
-			Add(new Range<TKey>(from, to), value);
-		}
-
-		public void Add(Range<TKey> range, TValue value) {
-			var left = ~this.Keys.BinarySearch(range.From);
-			var right = ~this.Keys.BinarySearch(range.To);
-			if ((left < 0) || (right < 0) || (left != right)) {
-				throw new ArgumentOutOfRangeException(nameof(range), "The range overlaps an existing range");
-			}
-			this.items.Insert(left, new KeyValuePair<Range<TKey>, TValue>(range, value));
-			MergeIfAdjacent(left, left+1);
-			MergeIfAdjacent(left-1, left);
-		}
-
-		public override bool Equals(object obj) {
-			if (ReferenceEquals(null, obj)) {
-				return false;
-			}
-			if (ReferenceEquals(this, obj)) {
-				return true;
-			}
-			if (obj.GetType() != GetType()) {
-				return false;
-			}
-			return Equals((RangeDictionary<TKey, TValue>)obj);
-		}
-
+		/// <summary>Enumerates the keys and values by expanding each range.</summary>
+		/// <returns>An enumerator that allows foreach to be used to process expanded in this collection.</returns>
+		[Pure]
 		public IEnumerable<KeyValuePair<TKey, TValue>> Expanded() {
 			return this.items.SelectMany(p => p.Key.Expand().Select(k => new KeyValuePair<TKey, TValue>(k, p.Value)));
 		}
 
-		public override int GetHashCode() {
-			return this.items.Aggregate(397, (hash, item) => unchecked(hash * 3+item.GetHashCode()));
+		internal IEnumerable<KeyValuePair<Range<TKey>, TValue>> GetSamples(int maxSampleCount) {
+			var increment = Math.Max(1, this.items.Count / maxSampleCount);
+			for (var i = 0; i < this.items.Count; i += increment) {
+				yield return this.items[i];
+			}
 		}
 
 		private void MergeIfAdjacent(int left, int right) {
-			Debug.Assert((right-left) == 1);
+			Debug.Assert((right - left) == 1);
 			if ((left < 0) || (right >= this.items.Count)) {
 				return;
 			}
@@ -174,36 +249,66 @@ namespace Sirius.Collections {
 			}
 		}
 
+		/// <summary>Enumerates the range keys and values intersecting the given slice range.</summary>
+		/// <param name="from">The lower bound of the range (inclusive).</param>
+		/// <param name="to">The upper bound of the range (inclusive).</param>
+		/// <returns>An enumerator that allows foreach to be used to process slice in this collection.</returns>
+		/// <remarks>This operation runs in O(n) time (worst), where n is the number of range key and value pairs)</remarks>
 		public IEnumerable<KeyValuePair<Range<TKey>, TValue>> Slice(TKey from, TKey to) {
-			return Slice(new Range<TKey>(from, to));
+			return this.Slice(new Range<TKey>(from, to));
 		}
 
+		/// <summary>Enumerates the range keys and values intersecting the given slice range.</summary>
+		/// <param name="range">The key range.</param>
+		/// <returns>An enumerator that allows foreach to be used to process slice in this collection.</returns>
+		/// <remarks>This operation runs in O(n) time (worst), where n is the number of range key and value pairs)</remarks>
+		[Pure]
 		public IEnumerable<KeyValuePair<Range<TKey>, TValue>> Slice(Range<TKey> range) {
-			var left = this.Keys.BinarySearch(range.From);
-			if (left < 0) {
-				left = ~left;
-			}
-			var right = this.Keys.BinarySearch(range.From);
-			if (right < 0) {
-				right = ~right-1;
-			}
-			for (var i = left; i <= right; i++) {
-				var current = this.items[i];
-				var from = current.Key.From;
-				var to = current.Key.To;
-				yield return new KeyValuePair<Range<TKey>, TValue>(
-					new Range<TKey>((i == left) && (@from.CompareTo(range.From) < 0) ? range.From : from, (i == right) && (to.CompareTo(range.To) > 0) ? range.To : to),
-					current.Value);
+			switch (this.items.Count) {
+			case 0:
+				break;
+			case 1:
+				var single = this.items[0];
+				var singleFrom = Incrementor<TKey>.Max(single.Key.From, range.From);
+				var singleTo = Incrementor<TKey>.Min(single.Key.To, range.To);
+				if (singleFrom.CompareTo(singleTo) <= 0) {
+					yield return new KeyValuePair<Range<TKey>, TValue>(new Range<TKey>(singleFrom, singleTo), single.Value);
+				}
+				break;
+			default:
+				var left = RangeOperations<TKey>.BinarySearch(this.Keys, range.From);
+				if (left < 0) {
+					left = ~left;
+				}
+				var right = RangeOperations<TKey>.BinarySearch(this.Keys, range.From);
+				if (right < 0) {
+					right = ~right - 1;
+				}
+				for (var i = left; i <= right; i++) {
+					var current = this.items[i];
+					var from = current.Key.From;
+					var to = current.Key.To;
+					yield return new KeyValuePair<Range<TKey>, TValue>(
+							new Range<TKey>((i == left) && (@from.CompareTo(range.From) < 0) ? range.From : from, (i == right) && (to.CompareTo(range.To) > 0) ? range.To : to),
+							current.Value);
+				}
+				break;
 			}
 		}
 
+		/// <summary>Attempts to get a value from the given key.</summary>
+		/// <param name="key">The key.</param>
+		/// <param name="value">[out] The value.</param>
+		/// <returns><c>true</c> if it succeeds, <c>false</c> if it fails.</returns>
+		/// <remarks>This operation takes O(log n) time, where n is the number of range key and value pairs)</remarks>
+		[Pure]
 		public bool TryGetValue(TKey key, out TValue value) {
-			var index = this.Keys.BinarySearch(key);
+			var index = RangeOperations<TKey>.BinarySearch(this.Keys, key);
 			if (index >= 0) {
 				value = this.items[index].Value;
 				return true;
 			}
-			value = default(TValue);
+			value = default;
 			return false;
 		}
 	}

@@ -24,6 +24,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Sirius.Common.xml</DocumentationFile>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Sirius.Common.xml</DocumentationFile>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -59,16 +62,18 @@
     <None Include="Sirius.Common.nuspec" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Annotations.cs" />
     <Compile Include="Collections\ArrayContentEqualityComparer.cs" />
     <Compile Include="Collections\Capture.cs" />
     <Compile Include="Collections\IdComparer.cs" />
     <Compile Include="Collections\IRangeSet.cs" />
-    <Compile Include="Collections\IReadWriteList.cs" />
     <Compile Include="Collections\LinkedFifoBuffer.cs" />
     <Compile Include="Collections\LinqExtensions.cs" />
     <Compile Include="Collections\Range.cs" />
     <Compile Include="Collections\RangeDictionary.cs" />
+    <Compile Include="Collections\RangeDictionaryComparer.cs" />
     <Compile Include="Collections\RangeExtensions.cs" />
+    <Compile Include="Collections\RangeOperations.cs" />
     <Compile Include="Collections\RangeSet.cs" />
     <Compile Include="Collections\ReferenceEqualityComparer.cs" />
     <Compile Include="Collections\SequenceEqualityComparer.cs" />
@@ -78,6 +83,7 @@
     <Compile Include="IIdentifiable.cs" />
     <Compile Include="IIncrementable.cs" />
     <Compile Include="Incrementor.cs" />
+    <Compile Include="Noninterlocked.cs" />
     <Compile Include="Numerics\BigDecimal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflect.cs" />
@@ -93,14 +99,14 @@
     <Compile Include="Unicode\Codepoint.cs" />
     <Compile Include="Unicode\Codepoints.cs" />
     <Compile Include="Unicode\Grapheme.cs" />
-    <Compile Include="Unicode\InvalidEncodingException.cs" />
-    <Compile Include="Unicode\InvalidRangeException.cs" />
     <Compile Include="Unicode\UnicodeExtensions.cs" />
     <Compile Include="Unicode\UnicodeRanges.cs" />
     <Compile Include="Unicode\UnsupportedCodepointException.cs" />
     <Compile Include="Unicode\Utf16Chars.cs" />
     <Compile Include="Unicode\Utf8Bytes.cs" />
     <Compile Include="Unicode\Utf8CharDecoder.cs" />
+    <Compile Include="Unicode\Utf8CodepointDecoder.cs" />
+    <Compile Include="Unicode\Utf8DecoderBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

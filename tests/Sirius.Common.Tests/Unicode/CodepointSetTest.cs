@@ -59,7 +59,7 @@ namespace Sirius.Unicode {
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('f', 'f'), ContainedIn.Right),
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('g', 'h'), ContainedIn.Both),
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('i', 'z'), ContainedIn.Right)
-			}, RangeSet<Codepoint>.EnumerateRanges(x, y));
+			}, RangeOperations<Codepoint>.EnumerateRanges(x, y));
 			Assert.Equal(new[] {
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('a', 'b'), ContainedIn.Right),
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('d', 'd'), ContainedIn.Right),
@@ -67,7 +67,7 @@ namespace Sirius.Unicode {
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('f', 'f'), ContainedIn.Left),
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('g', 'h'), ContainedIn.Both),
 					new KeyValuePair<Range<Codepoint>, ContainedIn>(Range<Codepoint>.Create('i', 'z'), ContainedIn.Left)
-			}, RangeSet<Codepoint>.EnumerateRanges(y, x));
+			}, RangeOperations<Codepoint>.EnumerateRanges(y, x));
 		}
 
 		[Fact]
@@ -75,10 +75,10 @@ namespace Sirius.Unicode {
 			RangeSet<Codepoint> x;
 			RangeSet<Codepoint> y;
 			PrepareCodepointSets(out x, out y);
-			Assert.Equal(x.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Left)), RangeSet<Codepoint>.EnumerateRanges(x, RangeSet<Codepoint>.Empty));
-			Assert.Equal(y.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Left)), RangeSet<Codepoint>.EnumerateRanges(y, RangeSet<Codepoint>.Empty));
-			Assert.Equal(x.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Right)), RangeSet<Codepoint>.EnumerateRanges(RangeSet<Codepoint>.Empty, x));
-			Assert.Equal(y.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Right)), RangeSet<Codepoint>.EnumerateRanges(RangeSet<Codepoint>.Empty, y));
+			Assert.Equal(x.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Left)), RangeOperations<Codepoint>.EnumerateRanges(x, RangeSet<Codepoint>.Empty));
+			Assert.Equal(y.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Left)), RangeOperations<Codepoint>.EnumerateRanges(y, RangeSet<Codepoint>.Empty));
+			Assert.Equal(x.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Right)), RangeOperations<Codepoint>.EnumerateRanges(RangeSet<Codepoint>.Empty, x));
+			Assert.Equal(y.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Right)), RangeOperations<Codepoint>.EnumerateRanges(RangeSet<Codepoint>.Empty, y));
 		}
 
 		[Fact]
@@ -86,8 +86,8 @@ namespace Sirius.Unicode {
 			RangeSet<Codepoint> x;
 			RangeSet<Codepoint> y;
 			PrepareCodepointSets(out x, out y);
-			Assert.Equal(x.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Both)), RangeSet<Codepoint>.EnumerateRanges(x, x));
-			Assert.Equal(y.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Both)), RangeSet<Codepoint>.EnumerateRanges(y, y));
+			Assert.Equal(x.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Both)), RangeOperations<Codepoint>.EnumerateRanges(x, x));
+			Assert.Equal(y.Select(r => new KeyValuePair<Range<Codepoint>, ContainedIn>(r, ContainedIn.Both)), RangeOperations<Codepoint>.EnumerateRanges(y, y));
 		}
 
 		[Fact]
@@ -105,15 +105,15 @@ namespace Sirius.Unicode {
 		[Fact]
 		public void UnionComplement1() {
 			var charSetA = new RangeSet<Codepoint>('a');
-			var charSet = RangeSet<Codepoint>.Union(charSetA, RangeSet<Codepoint>.Negate(charSetA));
+			var charSet = RangeOperations<Codepoint>.Union(charSetA, RangeOperations<Codepoint>.Negate(charSetA));
 			Assert.Equal(new[] {Range<Codepoint>.Create(Codepoint.MinValue, Codepoint.MaxValue)}, charSet);
 		}
 
 		[Fact]
 		public void UnionComplement2() {
 			var charSetA = new RangeSet<Codepoint>('a');
-			var charSetNotA = RangeSet<Codepoint>.Difference(RangeSet<Codepoint>.All, charSetA);
-			var charSet = RangeSet<Codepoint>.Union(charSetNotA, charSetA);
+			var charSetNotA = RangeOperations<Codepoint>.Difference(RangeSet<Codepoint>.All, charSetA);
+			var charSet = RangeOperations<Codepoint>.Union(charSetNotA, charSetA);
 			Assert.Equal(new[] {Range<Codepoint>.Create(Codepoint.MinValue, Codepoint.MaxValue)}, charSet);
 		}
 	}
