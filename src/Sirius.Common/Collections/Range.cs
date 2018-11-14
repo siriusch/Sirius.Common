@@ -244,6 +244,7 @@ namespace Sirius.Collections {
 		/// <summary>Checks whether the given item is in the range.</summary>
 		/// <param name="key">The item to check.</param>
 		/// <returns><c>true</c> if the item is in this range, <c>false</c> if not.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public bool Contains(T key) {
 			return (this.From.CompareTo(key) <= 0) && (this.To.CompareTo(key) >= 0);
@@ -254,6 +255,7 @@ namespace Sirius.Collections {
 		/// <returns><c>true</c> if the given range is fully contained in this range, <c>false</c> if not.</returns>
 		/// <seealso cref="IsContainedIn"/>
 		/// <seealso cref="Intersects"/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public bool Contains(Range<T> range) {
 			return (this.From.CompareTo(range.From) <= 0) && (this.To.CompareTo(range.To) >= 0);
@@ -263,6 +265,7 @@ namespace Sirius.Collections {
 		/// <param name="range">The range to check.</param>
 		/// <returns><c>true</c> if the given range full contains this range, <c>false</c> if not.</returns>
 		/// <seealso cref="Contains(Range{T})"/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public bool IsContainedIn(Range<T> range) {
 			return range.Contains(this);
@@ -272,6 +275,7 @@ namespace Sirius.Collections {
 		/// <param name="range">The range to check.</param>
 		/// <returns><c>true</c> if the given range intersects this range, <c>false</c> if not.</returns>
 		/// <seealso cref="Contains(Range{T})"/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public bool Intersects(Range<T> range) {
 			return (this.From.CompareTo(range.To) <= 0) && (range.From.CompareTo(this.To) <= 0);
@@ -282,11 +286,11 @@ namespace Sirius.Collections {
 		[Pure]
 		public IEnumerable<T> Expand() {
 			var increment = Incrementor<T>.Increment;
-			for (var current = this.From;; current = increment(current)) {
+			var current = this.From;
+			yield return current;
+			while (current.CompareTo(this.To) != 0) {
+				current = increment(current);
 				yield return current;
-				if (current.CompareTo(this.To) == 0) {
-					yield break;
-				}
 			}
 		}
 
@@ -294,32 +298,32 @@ namespace Sirius.Collections {
 		/// <returns>A <see cref="T:System.String" /> containing a textual representation of the range.</returns>
 		[Pure]
 		public override string ToString() {
-			return this.From.CompareTo(this.To) == 0 ? this.From.ToString() : string.Format("{0}..{1}", this.From, this.To);
+			return this.From.CompareTo(this.To) == 0 ? this.From.ToString() : $"{this.From}..{this.To}";
 		}
 
 		/// <summary>Indicates whether the current range is equal to another range.</summary>
 		/// <param name="other">A range to compare to this range.</param>
 		/// <returns><c>true</c> if the current range is equal to the <paramref name="other" /> range; otherwise, <c>false</c>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
 		public bool Equals(Range<T> other) {
-			return EqualityComparer<T>.Default.Equals(this.From, other.From) && EqualityComparer<T>.Default.Equals(this.To, other.To);
+			return this.From.CompareTo(other.From) == 0 && this.To.CompareTo(other.To) == 0;
 		}
 
 		/// <summary>Indicates whether the current range and a specified object are equal.</summary>
 		/// <param name="obj">The object to compare with the current range.</param>
 		/// <returns><c>true</c> if <paramref name="obj" /> is an equal range; otherwise, <c>false</c>.</returns>
 		public override bool Equals(object obj) {
-			if (ReferenceEquals(null, obj)) {
+			if (!(obj is Range<T>)) {
 				return false;
 			}
-			return obj is Range<T> && this.Equals((Range<T>)obj);
+			return this.Equals((Range<T>)obj);
 		}
 
 		/// <summary>Returns the hash code for this range.</summary>
 		/// <returns>A 32-bit signed integer that is the hash code for this range.</returns>
 		public override int GetHashCode() {
-			unchecked {
-				return (EqualityComparer<T>.Default.GetHashCode(this.From) * 397) ^ EqualityComparer<T>.Default.GetHashCode(this.To);
-			}
+			return unchecked((this.From.GetHashCode() * 397) ^ this.To.GetHashCode());
 		}
 	}
 }

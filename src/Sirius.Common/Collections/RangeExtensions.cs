@@ -35,7 +35,7 @@ namespace Sirius.Collections {
 					}
 					i++;
 				}
-				yield return new Range<T>(@from, to);
+				yield return new Range<T>(from, to);
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace Sirius.Collections {
 		[Pure]
 		public static IEnumerable<Range<T>> Normalize<T>(this IEnumerable<Range<T>> items)
 				where T: IComparable<T> {
-			return NormalizeFromSorted(items.OrderBy(r => r.From));
+			return items as IRangeSet<T> ?? NormalizeFromSorted(items.OrderBy(r => r.From));
 		}
 
 		[Pure]

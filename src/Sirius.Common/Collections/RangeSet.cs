@@ -87,6 +87,48 @@ namespace Sirius.Collections {
 		/// <remarks>Unlike the other range operators, this operator is not commutative.</remarks>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
+		public static RangeSet<T> operator -(Range<T> left, RangeSet<T> right) {
+			return RangeOperations<T>.Subtract(new RangeSet<T>(left), right);
+		}
+
+		/// <summary>Range subtraction operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the <paramref name="left" /> ranges minus the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>Unlike the other range operators, this operator is not commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator -(RangeSet<T> left, Range<T> right) {
+			return RangeOperations<T>.Subtract(left, new RangeSet<T>(right));
+		}
+
+		/// <summary>Range subtraction operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the <paramref name="left" /> ranges minus the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>Unlike the other range operators, this operator is not commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator -(RangeSet<T> left, T right) {
+			return RangeOperations<T>.Subtract(left, new RangeSet<T>(right));
+		}
+
+		/// <summary>Range subtraction operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the <paramref name="left" /> ranges minus the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>Unlike the other range operators, this operator is not commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
 		public static RangeSet<T> operator -(RangeSet<T> left, RangeSet<T> right) {
 			return RangeOperations<T>.Subtract(left, right);
 		}
@@ -105,6 +147,62 @@ namespace Sirius.Collections {
 			return RangeOperations<T>.Union(left, right);
 		}
 
+		/// <summary>Range union operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the union of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator |(Range<T> left, RangeSet<T> right) {
+			return RangeOperations<T>.Union(new RangeSet<T>(left), right);
+		}
+
+		/// <summary>Range union operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the union of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator |(T left, RangeSet<T> right) {
+			return right.Contains(left) ? right : RangeOperations<T>.Union(new RangeSet<T>(left), right);
+		}
+
+		/// <summary>Range union operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the union of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator |(RangeSet<T> left, Range<T> right) {
+			return RangeOperations<T>.Union(left, new RangeSet<T>(right));
+		}
+
+		/// <summary>Range union operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the union of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges.
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator |(RangeSet<T> left, T right) {
+			return left.Contains(right) ? left : RangeOperations<T>.Union(left, new RangeSet<T>(right));
+		}
+
 		/// <summary>Range intersection operator.</summary>
 		/// <param name="left">The left range set.</param>
 		/// <param name="right">The right range set.</param>
@@ -117,20 +215,6 @@ namespace Sirius.Collections {
 		[Pure]
 		public static RangeSet<T> operator &(RangeSet<T> left, RangeSet<T> right) {
 			return RangeOperations<T>.Intersection(left, right);
-		}
-
-		/// <summary>Range difference operator.</summary>
-		/// <param name="left">The left range set.</param>
-		/// <param name="right">The right range set.</param>
-		/// <returns>
-		///     A <see cref="RangeSet{T}" /> representing the difference of the <paramref name="left" /> and the
-		///     <paramref name="right" /> ranges (e.g. items which are only in one of the ranges).
-		/// </returns>
-		/// <remarks>This operator is commutative.</remarks>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		[Pure]
-		public static RangeSet<T> operator ^(RangeSet<T> left, RangeSet<T> right) {
-			return RangeOperations<T>.Difference(left, right);
 		}
 
 		/// <summary>Range intersection operator.</summary>
@@ -189,32 +273,74 @@ namespace Sirius.Collections {
 			return left.Contains(right) ? right : Empty;
 		}
 
-		/// <summary>Range union operator.</summary>
+		/// <summary>Range difference operator.</summary>
 		/// <param name="left">The left range set.</param>
 		/// <param name="right">The right range set.</param>
 		/// <returns>
-		///     A <see cref="RangeSet{T}" /> representing the union of the <paramref name="left" /> and the
-		///     <paramref name="right" /> ranges.
+		///     A <see cref="RangeSet{T}" /> representing the difference of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges (e.g. items which are only in one of the ranges).
 		/// </returns>
 		/// <remarks>This operator is commutative.</remarks>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
-		public static RangeSet<T> operator |(T left, RangeSet<T> right) {
-			return right.Contains(left) ? right : RangeOperations<T>.Union(new RangeSet<T>(left), right);
+		public static RangeSet<T> operator ^(RangeSet<T> left, RangeSet<T> right) {
+			return RangeOperations<T>.Difference(left, right);
 		}
 
-		/// <summary>Range union operator.</summary>
+		/// <summary>Range difference operator.</summary>
 		/// <param name="left">The left range set.</param>
 		/// <param name="right">The right range set.</param>
 		/// <returns>
-		///     A <see cref="RangeSet{T}" /> representing the union of the <paramref name="left" /> and the
-		///     <paramref name="right" /> ranges.
+		///     A <see cref="RangeSet{T}" /> representing the difference of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges (e.g. items which are only in one of the ranges).
 		/// </returns>
 		/// <remarks>This operator is commutative.</remarks>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
-		public static RangeSet<T> operator |(RangeSet<T> left, T right) {
-			return left.Contains(right) ? left : RangeOperations<T>.Union(left, new RangeSet<T>(right));
+		public static RangeSet<T> operator ^(Range<T> left, RangeSet<T> right) {
+			return RangeOperations<T>.Difference(new RangeSet<T>(left), right);
+		}
+
+		/// <summary>Range difference operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the difference of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges (e.g. items which are only in one of the ranges).
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator ^(T left, RangeSet<T> right) {
+			return RangeOperations<T>.Difference(new RangeSet<T>(left), right);
+		}
+
+		/// <summary>Range difference operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the difference of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges (e.g. items which are only in one of the ranges).
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator ^(RangeSet<T> left, Range<T> right) {
+			return RangeOperations<T>.Difference(left, new RangeSet<T>(right));
+		}
+
+		/// <summary>Range difference operator.</summary>
+		/// <param name="left">The left range set.</param>
+		/// <param name="right">The right range set.</param>
+		/// <returns>
+		///     A <see cref="RangeSet{T}" /> representing the difference of the <paramref name="left" /> and the
+		///     <paramref name="right" /> ranges (e.g. items which are only in one of the ranges).
+		/// </returns>
+		/// <remarks>This operator is commutative.</remarks>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[Pure]
+		public static RangeSet<T> operator ^(RangeSet<T> left, T right) {
+			return RangeOperations<T>.Difference(left, new RangeSet<T>(right));
 		}
 
 		private static readonly Lazy<RangeSet<T>> all = new Lazy<RangeSet<T>>(() => new RangeSet<T>(Range<T>.All), LazyThreadSafetyMode.PublicationOnly);
@@ -245,7 +371,7 @@ namespace Sirius.Collections {
 
 		/// <summary>Create a range set from the given ranges.</summary>
 		/// <param name="ranges">The ranges to use for the range set. They do not have to be normalized.</param>
-		public RangeSet(IEnumerable<Range<T>> ranges): this(ranges.Normalize().ToArray()) { }
+		public RangeSet(IEnumerable<Range<T>> ranges): this(ranges is RangeSet<T> ? ((RangeSet<T>)ranges).ranges : ranges.Normalize().ToArray()) { }
 
 		internal RangeSet(Range<T>[] normalizedPrivateRanges) {
 			this.ranges = (normalizedPrivateRanges != null && normalizedPrivateRanges.Length > 0) ? normalizedPrivateRanges : null;
@@ -254,10 +380,10 @@ namespace Sirius.Collections {
 		/// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
 		/// <param name="other">An object to compare with this object.</param>
 		/// <returns>true if the current object is equal to the <paramref name="other" /> parameter; otherwise, false.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[Pure]
 		public bool Equals(RangeSet<T> other) {
-			var count = this.Count;
-			return (count == other.Count) && (count == 0) || this.ranges.SequenceEqual(other.ranges);
+			return RangeOperations<T>.Equals(this, other);
 		}
 
 		/// <summary>Indexer to get ranges within this range set using array index syntax.</summary>
@@ -274,19 +400,25 @@ namespace Sirius.Collections {
 
 		/// <summary>Gets a value indicating whether this RangeSet&lt;T&gt; is empty.</summary>
 		/// <value><c>true</c> if this RangeSet&lt;T&gt; is empty, <c>false</c> if not.</value>
-		public bool IsEmpty => this.ranges == null;
+		public bool IsEmpty {
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => this.ranges == null;
+		}
 
 		/// <summary>Gets the enumerator.</summary>
 		/// <returns>The enumerator.</returns>
 		[Pure]
 		public IEnumerator<Range<T>> GetEnumerator() {
-			return (this.ranges == null ? Enumerable.Empty<Range<T>>() : this.ranges).GetEnumerator();
+			return (this.ranges ?? Enumerable.Empty<Range<T>>()).GetEnumerator();
 		}
 
 		/// <summary>Gets the number of ranges in the set.</summary>
 		/// <value>The count.</value>
 		/// <remarks>To get the total number of items, use the <see cref="GetItemCount" /> method.</remarks>
-		public int Count => this.ranges == null ? 0 : this.ranges.Length;
+		public int Count {
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => this.ranges == null ? 0 : this.ranges.Length;
+		}
 
 		/// <summary>Gets the number of items in the ranges of the set.</summary>
 		/// <value>The count.</value>
@@ -315,9 +447,9 @@ namespace Sirius.Collections {
 		[Pure]
 		public override bool Equals(object obj) {
 			if (obj is RangeSet<T> set) {
-				return this.Equals(set);
+				return RangeOperations<T>.Equals(this, set);
 			}
-			return this.Equals(obj as IRangeSet<T>);
+			return RangeOperations<T>.Equals(this, obj as IRangeSet<T>);
 		}
 
 		/// <summary>Enumerates expand in this collection.</summary>

@@ -40,39 +40,6 @@ namespace Sirius.Collections {
 			return ~left;
 		}
 
-		/// <summary>Generically query if 'set' is empty.</summary>
-		/// <remarks>
-		///     This method avoids boxing when applied on a struct implementing <see cref="IRangeSet{T}" />. A <c>null</c>
-		///     <paramref name="set" /> however will be seen as being empty.
-		/// </remarks>
-		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
-		/// <param name="set">The range set.</param>
-		/// <returns><c>true</c> if empty set, <c>false</c> if not.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		[Pure]
-		public static bool IsEmptySet<TRangeSet>(TRangeSet set)
-				where TRangeSet: IRangeSet<T> {
-			if (!typeof(TRangeSet).IsValueType && ReferenceEquals(set, null)) {
-				return true;
-			}
-			return set.Count == 0;
-		}
-
-		/// <summary>Generically gets range enumerator.</summary>
-		/// <remarks>This method avoids boxing when applied on a struct implementing <see cref="IRangeSet{T}" />.</remarks>
-		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
-		/// <param name="set">The range set.</param>
-		/// <returns>The range enumerator.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		[Pure]
-		internal static IEnumerator<Range<T>> GetRangeEnumerator<TRangeSet>(TRangeSet set)
-				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(set)) {
-				return Enumerable.Empty<Range<T>>().GetEnumerator();
-			}
-			return set.GetEnumerator();
-		}
-
 		/// <summary>Generically check for a value in a range set.</summary>
 		/// <typeparam name="TRangeSet">Type of the range set.</typeparam>
 		/// <param name="set">The range set.</param>
@@ -81,7 +48,7 @@ namespace Sirius.Collections {
 		[Pure]
 		public static bool Contains<TRangeSet>(TRangeSet set, T value)
 				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(set)) {
+			if ((set == null) || (set.Count == 0)) {
 				return false;
 			}
 			var first = set[0];
@@ -100,7 +67,7 @@ namespace Sirius.Collections {
 		[Pure]
 		private static RangeSet<T> AsRangeSet<TRangeSet>(TRangeSet set)
 				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(set)) {
+			if ((set == null) || (set.Count == 0)) {
 				return RangeSet<T>.Empty;
 			}
 			if (set is RangeSet<T> rangeSet) {
@@ -118,23 +85,18 @@ namespace Sirius.Collections {
 		public static bool Equals<TRangeSetLeft, TRangeSetRight>(TRangeSetLeft left, TRangeSetRight right)
 				where TRangeSetLeft: IRangeSet<T>
 				where TRangeSetRight: IRangeSet<T> {
-			var isLeftReference = !typeof(TRangeSetLeft).IsValueType;
-			var isRightReference = !typeof(TRangeSetRight).IsValueType;
-			if (isLeftReference && isRightReference && ReferenceEquals(left, right)) {
-				return true;
+			if (left == null) {
+				return right == null;
 			}
-			if (isLeftReference && ReferenceEquals(left, null)) {
-				return false;
-			}
-			if (isRightReference && ReferenceEquals(right, null)) {
+			if (right == null) {
 				return false;
 			}
 			var count = left.Count;
 			if (count != right.Count) {
 				return false;
 			}
-			for (var i = 0; i < count; i++) {
-				if (left[i] != right[i]) {
+			while (--count >= 0) {
+				if (left[count] != right[count]) {
 					return false;
 				}
 			}
@@ -155,8 +117,8 @@ namespace Sirius.Collections {
 		public static IEnumerable<TResult> EnumerateRanges<TRangeSetLeft, TRangeSetRight, TResult>(TRangeSetLeft left, TRangeSetRight right, Func<Range<T>, int?, int?, TResult> process)
 				where TRangeSetLeft: IRangeSet<T>
 				where TRangeSetRight: IRangeSet<T> {
-			using (var enumLeft = GetRangeEnumerator(left)) {
-				using (var enumRight = GetRangeEnumerator(right)) {
+			using (var enumLeft = left == null ? Enumerable.Empty<Range<T>>().GetEnumerator() : left.GetEnumerator()) {
+				using (var enumRight = right == null ? Enumerable.Empty<Range<T>>().GetEnumerator() : right.GetEnumerator()) {
 					var ixLeft = -1;
 					var ixRight = -1;
 					var rngLeft = enumLeft.GetNext(ref ixLeft);
@@ -233,10 +195,10 @@ namespace Sirius.Collections {
 		public static RangeSet<T> Subtract<TRangeSetLeft, TRangeSetRight>(TRangeSetLeft left, TRangeSetRight right)
 				where TRangeSetLeft: IRangeSet<T>
 				where TRangeSetRight: IRangeSet<T> {
-			if (IsEmptySet(left)) {
+			if ((left == null) || (left.Count == 0)) {
 				return RangeSet<T>.Empty;
 			}
-			if (IsEmptySet(right)) {
+			if ((right == null) || (right.Count == 0)) {
 				return AsRangeSet(left);
 			}
 			return new RangeSet<T>(EnumerateRanges(left, right).Where(r => r.Value == ContainedIn.Left).Select(r => r.Key).ToArray());
@@ -255,10 +217,10 @@ namespace Sirius.Collections {
 		public static RangeSet<T> Difference<TRangeSetLeft, TRangeSetRight>(TRangeSetLeft left, TRangeSetRight right)
 				where TRangeSetLeft: IRangeSet<T>
 				where TRangeSetRight: IRangeSet<T> {
-			if (IsEmptySet(right)) {
+			if ((right == null) || (right.Count == 0)) {
 				return AsRangeSet(left);
 			}
-			if (IsEmptySet(left)) {
+			if ((left == null) || (left.Count == 0)) {
 				return AsRangeSet(right);
 			}
 			return new RangeSet<T>(EnumerateRanges(left, right).Where(r => r.Value != ContainedIn.Both).Select(r => r.Key).NormalizeFromSorted().ToArray());
@@ -277,7 +239,7 @@ namespace Sirius.Collections {
 		public static RangeSet<T> Intersection<TRangeSetLeft, TRangeSetRight>(TRangeSetLeft left, TRangeSetRight right)
 				where TRangeSetLeft: IRangeSet<T>
 				where TRangeSetRight: IRangeSet<T> {
-			if (IsEmptySet(left) || IsEmptySet(right)) {
+			if ((left == null) || (left.Count == 0) || ((right == null) || (right.Count == 0))) {
 				return RangeSet<T>.Empty;
 			}
 			return new RangeSet<T>(EnumerateRanges(left, right).Where(r => r.Value == ContainedIn.Both).Select(r => r.Key).ToArray());
@@ -289,7 +251,7 @@ namespace Sirius.Collections {
 		/// <returns>A <see cref="RangeSet{T}" /> representing the complement of the input <paramref name="set" />.</returns>
 		public static RangeSet<T> Negate<TRangeSet>(TRangeSet set)
 				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(set)) {
+			if ((set == null) || (set.Count == 0)) {
 				return RangeSet<T>.All;
 			}
 			if (Equals(RangeSet<T>.All, set)) {
@@ -305,7 +267,7 @@ namespace Sirius.Collections {
 		/// <returns>A <see cref="RangeSet{T}" /> representing the slice of the input <paramref name="set" />.</returns>
 		public static RangeSet<T> Slice<TRangeSet>(TRangeSet set, Range<T> slice)
 				where TRangeSet: IRangeSet<T> {
-			if (IsEmptySet(set)) {
+			if ((set == null) || (set.Count == 0)) {
 				return RangeSet<T>.Empty;
 			}
 			var first = set[0];
@@ -346,10 +308,10 @@ namespace Sirius.Collections {
 		public static RangeSet<T> Union<TRangeSetLeft, TRangeSetRight>(TRangeSetLeft left, TRangeSetRight right)
 				where TRangeSetLeft: IRangeSet<T>
 				where TRangeSetRight: IRangeSet<T> {
-			if (IsEmptySet(left)) {
+			if ((left == null) || (left.Count == 0)) {
 				return AsRangeSet(right);
 			}
-			if (IsEmptySet(right)) {
+			if ((right == null) || (right.Count == 0)) {
 				return AsRangeSet(left);
 			}
 			if (Equals(RangeSet<T>.All, left) || Equals(RangeSet<T>.All, right)) {
