@@ -103,6 +103,7 @@
     <Compile Include="IncrementorTest.cs" />
     <Compile Include="Numerics\BigDecimalTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateMachine\StateMachineTest.cs" />
     <Compile Include="Text\ConsoleTextWriterTest.cs" />
     <Compile Include="Unicode\CodepointSetTest.cs" />
     <Compile Include="Unicode\CodepointsTest.cs" />

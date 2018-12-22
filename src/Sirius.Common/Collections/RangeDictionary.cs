@@ -92,6 +92,45 @@ namespace Sirius.Collections {
 			}
 		}
 
+		private class VirtualDictionary: IReadOnlyDictionary<TKey, TValue> {
+			private readonly RangeDictionary<TKey, TValue> owner;
+
+			public VirtualDictionary(RangeDictionary<TKey, TValue> owner) {
+				this.owner = owner;
+			}
+
+			public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() {
+				return owner.items.SelectMany(p => p.Key.Expand().Select(k => new KeyValuePair<TKey, TValue>(k, p.Value))).GetEnumerator();
+			}
+
+			IEnumerator IEnumerable.GetEnumerator() {
+				return this.GetEnumerator();
+			}
+
+			public int Count => owner.items.Select(i => i.Key.Count()).Sum();
+
+			public bool ContainsKey(TKey key) {
+				return RangeOperations<TKey>.BinarySearch(this.owner.Keys, key) >= 0;
+			}
+
+			public bool TryGetValue(TKey key, out TValue value) {
+				return this.owner.TryGetValue(key, out value);
+			}
+
+			public TValue this[TKey key] {
+				get {
+					if (this.owner.TryGetValue(key, out var result)) {
+						return result;
+					}
+					throw new KeyNotFoundException();
+				}
+			}
+
+			public IEnumerable<TKey> Keys => this.owner.Keys.Expand();
+
+			public IEnumerable<TValue> Values => this.owner.SelectMany(p => Enumerable.Repeat(p.Value, p.Key.Count()));
+		}
+
 		private readonly List<KeyValuePair<Range<TKey>, TValue>> items = new List<KeyValuePair<Range<TKey>, TValue>>();
 
 		private readonly IEqualityComparer<TValue> valueEqualityComparer;
@@ -106,6 +145,7 @@ namespace Sirius.Collections {
 			this.valueEqualityComparer = valueEqualityComparer ?? EqualityComparer<TValue>.Default;
 			this.Keys = new KeySet(this.items);
 			this.Values = new ValueList(this.items);
+			this.Expanded = new VirtualDictionary(this);
 		}
 
 		/// <summary>Creates a new <see cref="RangeDictionary{TKey,TValue}" />.</summary>
@@ -143,6 +183,12 @@ namespace Sirius.Collections {
 			get;
 		}
 
+		/// <summary>Gets an expanded view.</summary>
+		/// <value>The expanded values.</value>
+		public IReadOnlyDictionary<TKey, TValue> Expanded {
+			get;
+		}
+
 		/// <summary>Returns an enumerator that iterates through the collection.</summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		[Pure]
@@ -155,7 +201,7 @@ namespace Sirius.Collections {
 			return this.GetEnumerator();
 		}
 
-		/// <summary>Adds a new value wt the specified key.</summary>
+		/// <summary>Adds a new value at the specified key.</summary>
 		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
 		/// <param name="key">The key.</param>
 		/// <param name="value">The value.</param>
@@ -164,7 +210,7 @@ namespace Sirius.Collections {
 			this.Add(new Range<TKey>(key, key), value);
 		}
 
-		/// <summary>Adds a new value wt the specified key range.</summary>
+		/// <summary>Adds a new value at the specified key range.</summary>
 		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
 		/// <param name="from">The lower bound of the range (inclusive).</param>
 		/// <param name="to">The upper bound of the range (inclusive).</param>
@@ -174,7 +220,7 @@ namespace Sirius.Collections {
 			this.Add(new Range<TKey>(from, to), value);
 		}
 
-		/// <summary>Adds a new value wt the specified key range.</summary>
+		/// <summary>Adds a new value at the specified key range.</summary>
 		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
 		/// <param name="range">The key range.</param>
 		/// <param name="value">The value.</param>
@@ -188,6 +234,26 @@ namespace Sirius.Collections {
 			this.items.Insert(left, new KeyValuePair<Range<TKey>, TValue>(range, value));
 			this.MergeIfAdjacent(left, left + 1);
 			this.MergeIfAdjacent(left - 1, left);
+		}
+
+		/// <summary>Adds a new value at the specified key ranges.</summary>
+		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
+		/// <param name="ranges">The key range.</param>
+		/// <param name="value">The value.</param>
+		/// <remarks>This operation takes O(log n) time, where n is the number of range key and value pairs)</remarks>
+		public void Add<TRangeSet>(TRangeSet ranges, TValue value) where TRangeSet: IRangeSet<TKey> {
+			foreach (var range in ranges) {
+				Add(range, value);
+			}
+		}
+
+		/// <summary>Adds a new value at the specified keys.</summary>
+		/// <exception cref="ArgumentOutOfRangeException">Thrown when the range overlaps an existing range of the dictionary.</exception>
+		/// <param name="keys">The key range.</param>
+		/// <param name="value">The value.</param>
+		/// <remarks>This operation takes O(log n) time, where n is the number of range key and value pairs)</remarks>
+		public void Add(IEnumerable<TKey> keys, TValue value) {
+			Add(new RangeSet<TKey>(keys), value);
 		}
 
 		/// <summary>Compares the content of the <see cref="RangeDictionary{TKey,TValue}" />.</summary>
@@ -217,13 +283,6 @@ namespace Sirius.Collections {
 				}
 			}
 			return true;
-		}
-
-		/// <summary>Enumerates the keys and values by expanding each range.</summary>
-		/// <returns>An enumerator that allows foreach to be used to process expanded in this collection.</returns>
-		[Pure]
-		public IEnumerable<KeyValuePair<TKey, TValue>> Expanded() {
-			return this.items.SelectMany(p => p.Key.Expand().Select(k => new KeyValuePair<TKey, TValue>(k, p.Value)));
 		}
 
 		internal IEnumerable<KeyValuePair<Range<TKey>, TValue>> GetSamples(int maxSampleCount) {
