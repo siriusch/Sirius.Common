@@ -12,11 +12,12 @@ namespace Sirius.StateMachine {
 
 		public override Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
 			saveContext = true;
-			var varContext = this.transition.Parameters[0];
+			var transition = emitter.ReplaceBuildersByIds(this.transition);
+			var varContext = transition.Parameters[0];
 			return base.Emit(emitter,
 					Expression.Block(new[] {varContext},
 							Expression.Assign(varContext, contextExpression),
-							this.transition.Body), ref saveContext);
+							transition.Body), ref saveContext);
 		}
 	}
 }

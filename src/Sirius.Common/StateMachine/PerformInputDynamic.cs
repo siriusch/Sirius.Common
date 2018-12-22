@@ -5,9 +5,9 @@ using System.Linq.Expressions;
 namespace Sirius.StateMachine {
 	internal class PerformInputDynamic<TComparand, TInput, TData>: IPerform<TComparand, TInput, TData>
 			where TComparand: IEquatable<TComparand> {
-		private readonly Expression<Func<TInput, TData, StateSwitchBuilder<TComparand, TInput, TData>>> computeState;
+		private readonly Expression<Func<TInput, TData, int>> computeState;
 
-		public PerformInputDynamic(Expression<Func<TInput, TData, StateSwitchBuilder<TComparand, TInput, TData>>> computeState, bool yield) {
+		public PerformInputDynamic(Expression<Func<TInput, TData, int>> computeState, bool yield) {
 			this.computeState = computeState;
 			this.Yield = yield;
 		}
@@ -17,9 +17,9 @@ namespace Sirius.StateMachine {
 		}
 
 		public Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
-			var computeStateInt = new ConstantReplacer<TComparand, TInput>(emitter).Modify(this.computeState);
-			var varInput = computeStateInt.Parameters[0];
-			var varContext = computeStateInt.Parameters[1];
+			var computeState = emitter.ReplaceBuildersByIds(this.computeState);
+			var varInput = computeState.Parameters[0];
+			var varContext = computeState.Parameters[1];
 			var body = new List<Expression>();
 			if (saveContext) {
 				body.Add(Expression.Assign(
@@ -32,11 +32,11 @@ namespace Sirius.StateMachine {
 			}
 			body.Add(Expression.Assign(varInput, emitter.InputParameter));
 			if (this.Yield) {
-				body.Add(computeStateInt.Body);
+				body.Add(computeState.Body);
 			} else {
 				body.Add(Expression.Assign(
 						emitter.StateParameter,
-						computeStateInt.Body));
+						computeState.Body));
 				body.Add(Expression.Goto(
 						emitter.StartLabel,
 						typeof(int)));

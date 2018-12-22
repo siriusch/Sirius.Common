@@ -21,6 +21,15 @@ namespace Sirius.StateMachine {
 	/// <typeparam name="TData">Type of the data.</typeparam>
 	public sealed class StateSwitchBuilder<TComparand, TInput, TData>: StateSwitchBuilder<TComparand, TInput>
 			where TComparand: IEquatable<TComparand> {
+		/// <summary>Explicit cast that converts the given StateSwitchBuilder&lt;TComparand,TInput,TData&gt; to an int.</summary>
+		/// <exception cref="NotSupportedException">Thrown when the requested operation is not supported.</exception>
+		/// <param name="builder">The builder.</param>
+		/// <returns>The result of the operation.</returns>
+		/// <remarks>This operator is only for usage in lambda expressions, it is not supported at runtime.</remarks>
+		public static explicit operator int(StateSwitchBuilder<TComparand, TInput, TData> builder) {
+			throw new NotSupportedException("This conversion is not supported at runtime");
+		}
+
 		private readonly StatePerformBuilder<TComparand, TInput, TData> @default = new StatePerformBuilder<TComparand, TInput, TData>();
 		private readonly List<KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TData>>> onMatch = new List<KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TData>>>();
 

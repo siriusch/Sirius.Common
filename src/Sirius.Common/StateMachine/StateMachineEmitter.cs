@@ -12,6 +12,7 @@ namespace Sirius.StateMachine {
 			where TComparand: IEquatable<TComparand> {
 		private readonly Dictionary<int, StateSwitchBuilder<TComparand, TInput>> switchStateIds = new Dictionary<int, StateSwitchBuilder<TComparand, TInput>>();
 		private readonly Dictionary<StateSwitchBuilder<TComparand, TInput>, int> switchStates = new Dictionary<StateSwitchBuilder<TComparand, TInput>, int>(ReferenceEqualityComparer<StateSwitchBuilder<TComparand, TInput>>.Default);
+		private readonly StateReferenceReplacer<TComparand, TInput> replacer;
 
 		/// <summary>Constructor.</summary>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
@@ -19,6 +20,7 @@ namespace Sirius.StateMachine {
 		/// <param name="conditionEmitter">The condition emitter.</param>
 		public StateMachineEmitter(StateSwitchBuilder<TComparand, TInput> root, IConditionEmitter<TComparand, TInput> conditionEmitter) {
 			this.InputParameter = Expression.Parameter(typeof(TInput), "input");
+			this.replacer = new StateReferenceReplacer<TComparand, TInput>(this);
 			this.StateParameter = Expression.Parameter(typeof(int).MakeByRefType(), "state");
 			this.ContextParameter = Expression.Parameter(typeof(object).MakeByRefType(), "context");
 			this.StartLabel = Expression.Label("start");
@@ -102,6 +104,15 @@ namespace Sirius.StateMachine {
 				this.switchStateIds.Add(value, switchState);
 			}
 			return value;
+		}
+
+		/// <summary>Replace builders by identifier.</summary>
+		/// <typeparam name="T">Type of the delegate to use for the expression lambda.</typeparam>
+		/// <param name="expression">The expression.</param>
+		/// <returns>An Expression&lt;T&gt;</returns>
+		/// <remarks>Replaces <c>(int)someBuilder</c> with the effective ID of the builder.</remarks>
+		public Expression<T> ReplaceBuildersByIds<T>(Expression<T> expression) {
+			return Expression.Lambda<T>(this.replacer.Visit(expression.Body), expression.Parameters);
 		}
 	}
 }

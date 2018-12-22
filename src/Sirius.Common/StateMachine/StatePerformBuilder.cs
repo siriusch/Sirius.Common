@@ -70,14 +70,14 @@ namespace Sirius.StateMachine {
 		/// <summary>Dynamically continue processing at the given state without waiting for new input.</summary>
 		/// <param name="computeState">An <see cref="Expression" /> which returns the next state as integer.</param>
 		/// <remarks>Use <see cref="StateMachineEmitter{TComparand, TInput}.GetIdForBuilder" /> to find the ID of a specific state.</remarks>
-		public void Goto(Expression<Func<TData, StateSwitchBuilder<TComparand, TInput, TData>>> computeState) {
+		public void Goto(Expression<Func<TData, int>> computeState) {
 			this.Perform = new PerformDynamic<TComparand, TInput, TData>(computeState, false);
 		}
 
 		/// <summary>Dynamically continue processing at the given state without waiting for new input.</summary>
 		/// <remarks>Use <see cref="StateMachineEmitter{TComparand, TInput}.GetIdForBuilder" /> to find the ID of a specific state.</remarks>
 		/// <param name="computeState">An <see cref="Expression" /> which returns the next state as integer.</param>
-		public void Goto(Expression<Func<TInput, TData, StateSwitchBuilder<TComparand, TInput, TData>>> computeState) {
+		public void Goto(Expression<Func<TInput, TData, int>> computeState) {
 			this.Perform = new PerformInputDynamic<TComparand, TInput, TData>(computeState, false);
 		}
 
@@ -99,14 +99,14 @@ namespace Sirius.StateMachine {
 		/// <summary>Dynamically continue processing at the given state when new input is received.</summary>
 		/// <param name="computeState">An <see cref="Expression" /> which returns the next state as integer.</param>
 		/// <remarks>Use <see cref="StateMachineEmitter{TComparand, TInput}.GetIdForBuilder" /> to find the ID of a specific state.</remarks>
-		public void Yield(Expression<Func<TData, StateSwitchBuilder<TComparand, TInput, TData>>> computeState) {
+		public void Yield(Expression<Func<TData, int>> computeState) {
 			this.Perform = new PerformDynamic<TComparand, TInput, TData>(computeState, true);
 		}
 
 		/// <summary>Dynamically continue processing at the given state when new input is received.</summary>
 		/// <param name="computeState">An <see cref="Expression" /> which returns the next state as integer.</param>
 		/// <remarks>Use <see cref="StateMachineEmitter{TComparand, TInput}.GetIdForBuilder" /> to find the ID of a specific state.</remarks>
-		public void Yield(Expression<Func<TInput, TData, StateSwitchBuilder<TComparand, TInput, TData>>> computeState) {
+		public void Yield(Expression<Func<TInput, TData, int>> computeState) {
 			this.Perform = new PerformInputDynamic<TComparand, TInput, TData>(computeState, true);
 		}
 
