@@ -98,6 +98,8 @@
     <Compile Include="StateMachine\PerformInputAction.cs" />
     <Compile Include="StateMachine\PerformInputDynamic.cs" />
     <Compile Include="StateMachine\PerformInputTransition.cs" />
+    <Compile Include="StateMachine\PerformStateAction.cs" />
+    <Compile Include="StateMachine\PerformStateTransition.cs" />
     <Compile Include="StateMachine\PerformStatic.cs" />
     <Compile Include="StateMachine\PerformTransition.cs" />
     <Compile Include="StateMachine\RangeConditionEmitter.cs" />

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
+using JetBrains.Annotations;
+
 using Sirius.Collections;
 
 namespace Sirius.StateMachine {
@@ -15,26 +17,21 @@ namespace Sirius.StateMachine {
 		private readonly StateReferenceReplacer<TComparand, TInput> replacer;
 
 		/// <summary>Constructor.</summary>
+		/// <exception cref="ArgumentNullException">Thrown when one or more required arguments are <c>null</c></exception>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <param name="root">The root.</param>
 		/// <param name="conditionEmitter">The condition emitter.</param>
-		public StateMachineEmitter(StateSwitchBuilder<TComparand, TInput> root, IConditionEmitter<TComparand, TInput> conditionEmitter) {
+		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter) {
+			this.Root = root ?? throw new ArgumentNullException(nameof(root));
+			this.ConditionEmitter = conditionEmitter ?? throw new ArgumentNullException(nameof(conditionEmitter));
 			this.InputParameter = Expression.Parameter(typeof(TInput), "input");
 			this.replacer = new StateReferenceReplacer<TComparand, TInput>(this);
 			this.StateParameter = Expression.Parameter(typeof(int).MakeByRefType(), "state");
 			this.ContextParameter = Expression.Parameter(typeof(object).MakeByRefType(), "context");
 			this.StartLabel = Expression.Label("start");
-			this.Root = root;
-			this.ConditionEmitter = conditionEmitter;
-			if (this.GetIdForBuilder(root) != 0) {
+			if (this.GetIdForBuilder(Root) != 0) {
 				throw new InvalidOperationException("Internal error: Unexpected root ID");
 			}
-		}
-
-		/// <summary>Gets the root.</summary>
-		/// <value>The root.</value>
-		public StateSwitchBuilder<TComparand, TInput> Root {
-			get;
 		}
 
 		/// <summary>Gets the condition emitter.</summary>
@@ -56,6 +53,12 @@ namespace Sirius.StateMachine {
 		}
 
 		internal LabelTarget StartLabel {
+			get;
+		}
+
+		/// <summary>Gets the root.</summary>
+		/// <value>The root.</value>
+		public StateSwitchBuilder<TComparand, TInput> Root {
 			get;
 		}
 
@@ -114,5 +117,27 @@ namespace Sirius.StateMachine {
 		public Expression<T> ReplaceBuildersByIds<T>(Expression<T> expression) {
 			return Expression.Lambda<T>(this.replacer.Visit(expression.Body), expression.Parameters);
 		}
+	}
+
+	/// <summary>A state machine emitter.</summary>
+	/// <typeparam name="TComparand">Type of the comparand.</typeparam>
+	/// <typeparam name="TInput">Type of the input.</typeparam>
+	/// <typeparam name="TRootData">Type of the data of the root.</typeparam>
+	public class StateMachineEmitter<TComparand, TInput, TRootData>: StateMachineEmitter<TComparand, TInput>
+			where TComparand: IEquatable<TComparand> {
+		/// <summary>Constructor.</summary>
+		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
+		/// <param name="conditionEmitter">The condition emitter.</param>
+		public StateMachineEmitter([NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): this(new StateSwitchBuilder<TComparand, TInput, TRootData>(), conditionEmitter) {}
+
+		/// <summary>Constructor.</summary>
+		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
+		/// <param name="root">The root.</param>
+		/// <param name="conditionEmitter">The condition emitter.</param>
+		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput, TRootData> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): base(root, conditionEmitter) {}
+
+		/// <summary>Gets the root.</summary>
+		/// <value>The root.</value>
+		public new StateSwitchBuilder<TComparand, TInput, TRootData> Root => (StateSwitchBuilder<TComparand, TInput, TRootData>)base.Root;
 	}
 }

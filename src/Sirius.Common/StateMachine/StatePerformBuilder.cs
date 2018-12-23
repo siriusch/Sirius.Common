@@ -38,7 +38,16 @@ namespace Sirius.StateMachine {
 			return link.Next;
 		}
 
-		/// <summary>Perform the given transition (independent of input).</summary>
+		/// <summary>Perform the given action.</summary>
+		/// <param name="action">The action.</param>
+		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
+		public StatePerformBuilder<TComparand, TInput, TData> State(Expression<Action<int, TData>> action) {
+			var link = new PerformStateAction<TComparand, TInput, TData>(action);
+			this.Perform = link;
+			return link.Next;
+		}
+
+		/// <summary>Perform the given data transition (independent of input).</summary>
 		/// <typeparam name="TDataOut">Type of the data out.</typeparam>
 		/// <param name="transitionChangeData">Information describing the transition change.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
@@ -48,12 +57,22 @@ namespace Sirius.StateMachine {
 			return link.Next;
 		}
 
-		/// <summary>Perform the given transition.</summary>
+		/// <summary>Perform the given data transition.</summary>
 		/// <typeparam name="TDataOut">Type of the data out.</typeparam>
 		/// <param name="transitionChangeData">Information describing the transition change.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
 		public StatePerformBuilder<TComparand, TInput, TDataOut> Do<TDataOut>(Expression<Func<TInput, TData, TDataOut>> transitionChangeData) {
 			var link = new PerformInputTransition<TComparand, TInput, TData, TDataOut>(transitionChangeData);
+			this.Perform = link;
+			return link.Next;
+		}
+
+		/// <summary>Perform the given data transition.</summary>
+		/// <typeparam name="TDataOut">Type of the data out.</typeparam>
+		/// <param name="transitionChangeData">Information describing the transition change.</param>
+		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
+		public StatePerformBuilder<TComparand, TInput, TDataOut> State<TDataOut>(Expression<Func<int, TData, TDataOut>> transitionChangeData) {
+			var link = new PerformStateTransition<TComparand, TInput, TData, TDataOut>(transitionChangeData);
 			this.Perform = link;
 			return link.Next;
 		}
