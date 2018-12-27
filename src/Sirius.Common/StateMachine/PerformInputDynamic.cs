@@ -17,20 +17,15 @@ namespace Sirius.StateMachine {
 		}
 
 		public Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
-			var computeState = emitter.ReplaceBuildersByIds(this.computeState);
-			var varInput = computeState.Parameters[0];
-			var varContext = computeState.Parameters[1];
 			var body = new List<Expression>();
 			if (saveContext) {
 				body.Add(Expression.Assign(
 						emitter.ContextParameter,
 						Expression.Convert(
-								Expression.Assign(varContext, contextExpression),
+								contextExpression,
 								typeof(object))));
-			} else {
-				body.Add(Expression.Assign(varContext, contextExpression));
 			}
-			body.Add(Expression.Assign(varInput, emitter.InputParameter));
+			var computeState = emitter.ReplaceBuildersByIds(this.computeState, emitter.InputParameter, contextExpression);
 			if (this.Yield) {
 				body.Add(computeState.Body);
 			} else {
@@ -41,7 +36,7 @@ namespace Sirius.StateMachine {
 						emitter.StartLabel,
 						typeof(int)));
 			}
-			return Expression.Block(new[] {varInput, varContext}, body);
+			return body.Count == 1 ? body[0] : Expression.Block(body);
 		}
 	}
 }

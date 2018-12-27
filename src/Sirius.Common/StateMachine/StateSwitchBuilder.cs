@@ -30,18 +30,17 @@ namespace Sirius.StateMachine {
 			throw new NotSupportedException("This conversion is not supported at runtime");
 		}
 
-		private readonly StatePerformBuilder<TComparand, TInput, TContext> @default = new StatePerformBuilder<TComparand, TInput, TContext>();
 		private readonly List<KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TContext>>> onMatch = new List<KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TContext>>>();
 
 		/// <summary>The default perform chain (if none of the inputs matched).</summary>
 		/// <value>The default builder.</value>
 		public StatePerformBuilder<TComparand, TInput, TContext> Default {
-			get => this.@default;
-		}
+			get;
+		} = new StatePerformBuilder<TComparand, TInput, TContext>();
 
 		internal override Expression Emit(StateMachineEmitter<TComparand, TInput> emitter) {
 			var varContext = Expression.Variable(typeof(TContext), "typedContext");
-			var result = this.@default.Emit(emitter, varContext);
+			var result = this.Default.Emit(emitter, varContext);
 			foreach (var pair in this.onMatch) {
 				result = Expression.Condition(
 						emitter.ConditionEmitter.Emit(pair.Key, emitter.InputParameter),

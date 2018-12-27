@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
@@ -17,18 +18,15 @@ namespace Sirius.StateMachine {
 		}
 
 		public Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
-			var computeState = emitter.ReplaceBuildersByIds(this.computeState);
-			var varContext = computeState.Parameters[0];
 			var body = new List<Expression>();
 			if (saveContext) {
 				body.Add(Expression.Assign(
 						emitter.ContextParameter,
 						Expression.Convert(
-								Expression.Assign(varContext, contextExpression),
+								contextExpression,
 								typeof(object))));
-			} else {
-				body.Add(Expression.Assign(varContext, contextExpression));
 			}
+			var computeState = emitter.ReplaceBuildersByIds(this.computeState, contextExpression);
 			if (this.Yield) {
 				body.Add(computeState.Body);
 			} else {
@@ -39,7 +37,7 @@ namespace Sirius.StateMachine {
 						emitter.StartLabel,
 						typeof(int)));
 			}
-			return Expression.Block(new[] {varContext}, body);
+			return body.Count == 1 ? body[0] : Expression.Block(body);
 		}
 	}
 }

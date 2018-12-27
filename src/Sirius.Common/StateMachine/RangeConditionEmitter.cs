@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -19,29 +20,48 @@ namespace Sirius.StateMachine {
 		/// <param name="varInput">The variable input.</param>
 		/// <returns>An Expression.</returns>
 		public Expression Emit(Range<TInput> comparand, ParameterExpression varInput) {
-			return typeof(TInput).IsPrimitive
-					? ((comparand.From.CompareTo(comparand.To) == 0)
-							? Expression.Equal(
-									varInput,
-									Expression.Constant(comparand.From))
-							: Expression.AndAlso(
-									Expression.GreaterThanOrEqual(
-											varInput,
-											Expression.Constant(comparand.From)),
-									Expression.LessThanOrEqual(
-											varInput,
-											Expression.Constant(comparand.To))))
-					: ((comparand.From.CompareTo(comparand.To) == 0)
-							? Expression.Equal(
-									Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.From)),
-									Expression.Constant(0))
-							: Expression.AndAlso(
-									Expression.GreaterThanOrEqual(
-											Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.From)),
-											Expression.Constant(0)),
-									Expression.LessThanOrEqual(
-											Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.To)),
-											Expression.Constant(0))));
+			switch (comparand.Expand().Take(3).Count()) {
+			case 1:
+				return typeof(TInput).IsPrimitive
+						? Expression.Equal(
+								varInput,
+								Expression.Constant(comparand.From))
+						: Expression.Equal(
+								Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.From)),
+								Expression.Constant(0));
+			case 2:
+				return typeof(TInput).IsPrimitive
+						? Expression.OrElse(
+								Expression.Equal(
+										varInput,
+										Expression.Constant(comparand.From)),
+								Expression.Equal(
+										varInput,
+										Expression.Constant(comparand.To)))
+						: Expression.OrElse(
+								Expression.Equal(
+										Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.From)),
+										Expression.Constant(0)),
+								Expression.Equal(
+										Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.To)),
+										Expression.Constant(0)));
+			default:
+				return typeof(TInput).IsPrimitive
+						? Expression.AndAlso(
+								Expression.GreaterThanOrEqual(
+										varInput,
+										Expression.Constant(comparand.From)),
+								Expression.LessThanOrEqual(
+										varInput,
+										Expression.Constant(comparand.To)))
+						: Expression.AndAlso(
+								Expression.GreaterThanOrEqual(
+										Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.From)),
+										Expression.Constant(0)),
+								Expression.LessThanOrEqual(
+										Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(comparand.To)),
+										Expression.Constant(0)));
+			}
 		}
 	}
 }

@@ -25,9 +25,15 @@ namespace Sirius.StateMachine {
 				}
 				var result = RangeConditionEmitter<TInput>.Default.Emit(enumerator.Current, varInput);
 				while (enumerator.MoveNext()) {
-					result = Expression.OrElse(
-							result,
-							RangeConditionEmitter<TInput>.Default.Emit(enumerator.Current, varInput));
+					var condition = RangeConditionEmitter<TInput>.Default.Emit(enumerator.Current, varInput);
+					result = (condition.NodeType == ExpressionType.OrElse) && condition is BinaryExpression orElseCondition
+							? Expression.OrElse(
+									Expression.OrElse(result,
+											orElseCondition.Left),
+									orElseCondition.Right)
+							: Expression.OrElse(
+									result,
+									condition);
 				}
 				return result;
 			}
