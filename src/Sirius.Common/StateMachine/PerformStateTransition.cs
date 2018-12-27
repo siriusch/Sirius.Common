@@ -2,11 +2,11 @@ using System;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal class PerformStateTransition<TComparand, TInput, TDataIn, TDataOut>: PerformActionBase<TComparand, TInput, TDataIn, TDataOut>
+	internal class PerformStateTransition<TComparand, TInput, TContextIn, TContextOut>: PerformActionBase<TComparand, TInput, TContextIn, TContextOut>
 			where TComparand: IEquatable<TComparand> {
-		private readonly Expression<Func<int, TDataIn, TDataOut>> transition;
+		private readonly Expression<Func<int, TContextIn, TContextOut>> transition;
 
-		public PerformStateTransition(Expression<Func<int, TDataIn, TDataOut>> transition) {
+		public PerformStateTransition(Expression<Func<int, TContextIn, TContextOut>> transition) {
 			this.transition = transition;
 		}
 

@@ -94,14 +94,14 @@
     <Compile Include="StateMachine\PerformAction.cs" />
     <Compile Include="StateMachine\PerformActionBase.cs" />
     <Compile Include="StateMachine\PerformConstant.cs" />
+    <Compile Include="StateMachine\PerformContextChange.cs" />
     <Compile Include="StateMachine\PerformDynamic.cs" />
     <Compile Include="StateMachine\PerformInputAction.cs" />
+    <Compile Include="StateMachine\PerformInputContextChange.cs" />
     <Compile Include="StateMachine\PerformInputDynamic.cs" />
-    <Compile Include="StateMachine\PerformInputTransition.cs" />
     <Compile Include="StateMachine\PerformStateAction.cs" />
     <Compile Include="StateMachine\PerformStateTransition.cs" />
     <Compile Include="StateMachine\PerformStatic.cs" />
-    <Compile Include="StateMachine\PerformTransition.cs" />
     <Compile Include="StateMachine\RangeConditionEmitter.cs" />
     <Compile Include="StateMachine\RangesConditionEmitter.cs" />
     <Compile Include="StateMachine\StateBuilderExtensions.cs" />

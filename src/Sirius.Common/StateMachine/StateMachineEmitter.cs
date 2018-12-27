@@ -15,6 +15,8 @@ namespace Sirius.StateMachine {
 		private readonly Dictionary<int, StateSwitchBuilder<TComparand, TInput>> switchStateIds = new Dictionary<int, StateSwitchBuilder<TComparand, TInput>>();
 		private readonly Dictionary<StateSwitchBuilder<TComparand, TInput>, int> switchStates = new Dictionary<StateSwitchBuilder<TComparand, TInput>, int>(ReferenceEqualityComparer<StateSwitchBuilder<TComparand, TInput>>.Default);
 		private readonly StateReferenceReplacer<TComparand, TInput> replacer;
+		private readonly List<Expression> onEnter = new List<Expression>();
+		private readonly List<Expression> onLeave = new List<Expression>();
 
 		/// <summary>Constructor.</summary>
 		/// <exception cref="ArgumentNullException">Thrown when one or more required arguments are <c>null</c></exception>
@@ -29,7 +31,7 @@ namespace Sirius.StateMachine {
 			this.StateParameter = Expression.Parameter(typeof(int).MakeByRefType(), "state");
 			this.ContextParameter = Expression.Parameter(typeof(object).MakeByRefType(), "context");
 			this.StartLabel = Expression.Label("start");
-			if (this.GetIdForBuilder(Root) != 0) {
+			if (this.GetIdForBuilder(this.Root) != 0) {
 				throw new InvalidOperationException("Internal error: Unexpected root ID");
 			}
 		}
@@ -56,6 +58,49 @@ namespace Sirius.StateMachine {
 			get;
 		}
 
+		private Expression InvokeIfMatchingContext<TContext>(Expression<Action<TInput, TContext>> action) {
+			var parInput = action.Parameters[0];
+			var parContext = action.Parameters[1];
+			if (typeof(TContext) == typeof(object)) {
+				return Expression.Block(new[] { parInput, parContext },
+						Expression.Assign(parInput, this.InputParameter),
+						Expression.Assign(parContext, this.ContextParameter),
+						action.Body);
+			}
+			if (typeof(TContext).IsValueType) {
+				return Expression.IfThen(
+						Expression.TypeIs(this.ContextParameter, typeof(TContext)),
+						Expression.Block(new[] { parInput, parContext },
+								Expression.Assign(parInput, this.InputParameter),
+								Expression.Assign(parContext,
+										Expression.Convert(this.ContextParameter, typeof(TContext))),
+								action.Body));
+			}
+			return Expression.Block(new[] {parInput, parContext},
+					Expression.IfThen(
+							Expression.NotEqual(
+									Expression.Assign(
+											parContext,
+											Expression.TypeAs(this.ContextParameter, typeof(TContext))),
+									Expression.Constant(null, typeof(TContext))),
+							action.Body));
+		}
+
+		/// <summary>Adds an action to execute for a specific context type upon entering the state machine.</summary>
+		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <param name="action">The action.</param>
+		/// <remarks>A Goto will not trigger a second execution.</remarks>
+		public void OnEnter<TData>(Expression<Action<TInput, TData>> action) {
+			this.onEnter.Add(this.InvokeIfMatchingContext(action));
+		}
+
+		/// <summary>Adds an action to execute for a specific context type upon leaving the state machine (on yield).</summary>
+		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <param name="action">The action.</param>
+		public void OnLeave<TData>(Expression<Action<TInput, TData>> action) {
+			this.onLeave.Add(this.InvokeIfMatchingContext(action));
+		}
+
 		/// <summary>Gets the root.</summary>
 		/// <value>The root.</value>
 		public StateSwitchBuilder<TComparand, TInput> Root {
@@ -80,18 +125,22 @@ namespace Sirius.StateMachine {
 								this.switchStateIds[state].Emit(this),
 								Expression.Constant(state)));
 			}
+			var body = new List<Expression>();
+			body.AddRange(this.onEnter);
+			body.Add(Expression.Label(this.StartLabel));
+			body.Add(Expression.Assign(
+					this.StateParameter,
+					Expression.Switch(typeof(int),
+							this.StateParameter,
+							Expression.Constant(this.BreakState),
+							null,
+							cases)));
+			body.AddRange(this.onLeave);
+			body.Add(Expression.GreaterThanOrEqual(
+							this.StateParameter,
+							Expression.Constant(0)));
 			return Expression.Lambda<StateMachineFunc<TInput>>(
-					Expression.Block(
-							Expression.Label(this.StartLabel),
-							Expression.GreaterThanOrEqual(
-									Expression.Assign(
-											this.StateParameter,
-											Expression.Switch(typeof(int),
-													this.StateParameter,
-													Expression.Constant(this.BreakState),
-													null,
-													cases)),
-									Expression.Constant(0))),
+					Expression.Block(body),
 					this.InputParameter,
 					this.StateParameter,
 					this.ContextParameter);

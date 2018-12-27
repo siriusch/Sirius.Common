@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal class PerformStatic<TComparand, TInput, TData>: IPerform<TComparand, TInput, TData>
+	internal class PerformStatic<TComparand, TInput, TContext>: IPerform<TComparand, TInput, TContext>
 			where TComparand: IEquatable<TComparand> {
-		public PerformStatic(StateSwitchBuilder<TComparand, TInput, TData> target, bool yield) {
+		public PerformStatic(StateSwitchBuilder<TComparand, TInput, TContext> target, bool yield) {
 			this.Yield = yield;
 			this.Target = target;
 		}
@@ -14,7 +14,7 @@ namespace Sirius.StateMachine {
 			get;
 		}
 
-		public StateSwitchBuilder<TComparand, TInput, TData> Target {
+		public StateSwitchBuilder<TComparand, TInput, TContext> Target {
 			get;
 		}
 

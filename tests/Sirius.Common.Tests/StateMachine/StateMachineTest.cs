@@ -26,6 +26,8 @@ namespace Sirius.StateMachine {
 			root.Default.Yield(root);
 			// Compile the state machine
 			var emitter = new StateMachineEmitter<char, char>(root, EquatableConditionEmitter<char>.Default);
+			emitter.OnEnter<object>((i, d) => this.output.WriteLine("+"));
+			emitter.OnLeave<object>((i, d) => this.output.WriteLine("-"));
 			var stateExpr = emitter.Emit();
 			var stateFn = stateExpr.Compile();
 			// Run the state machine for some input

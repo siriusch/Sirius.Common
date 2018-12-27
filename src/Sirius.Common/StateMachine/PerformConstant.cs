@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal class PerformConstant<TComparand, TInput, TData>: IPerform<TComparand, TInput, TData>
+	internal class PerformConstant<TComparand, TInput, TContext>: IPerform<TComparand, TInput, TContext>
 			where TComparand: IEquatable<TComparand> {
-		public static readonly PerformConstant<TComparand, TInput, TData> Break = new PerformConstant<TComparand, TInput, TData>(null, true);
+		public static readonly PerformConstant<TComparand, TInput, TContext> Break = new PerformConstant<TComparand, TInput, TContext>(null, true);
 
 		public PerformConstant(int? target, bool yield) {
 			this.Yield = yield;

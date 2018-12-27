@@ -2,11 +2,11 @@ using System;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal class PerformInputAction<TComparand, TInput, TData>: PerformActionBase<TComparand, TInput, TData, TData>
+	internal class PerformInputAction<TComparand, TInput, TContext>: PerformActionBase<TComparand, TInput, TContext, TContext>
 			where TComparand: IEquatable<TComparand> {
-		private readonly Expression<Action<TInput, TData>> action;
+		private readonly Expression<Action<TInput, TContext>> action;
 
-		public PerformInputAction(Expression<Action<TInput, TData>> action) {
+		public PerformInputAction(Expression<Action<TInput, TContext>> action) {
 			this.action = action;
 		}
 

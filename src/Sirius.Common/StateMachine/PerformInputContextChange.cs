@@ -2,20 +2,22 @@ using System;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal class PerformTransition<TComparand, TInput, TDataIn, TDataOut>: PerformActionBase<TComparand, TInput, TDataIn, TDataOut>
+	internal class PerformInputContextChange<TComparand, TInput, TContextIn, TContextOut>: PerformActionBase<TComparand, TInput, TContextIn, TContextOut>
 			where TComparand: IEquatable<TComparand> {
-		private readonly Expression<Func<TDataIn, TDataOut>> transition;
+		private readonly Expression<Func<TInput, TContextIn, TContextOut>> transition;
 
-		public PerformTransition(Expression<Func<TDataIn, TDataOut>> transition) {
+		public PerformInputContextChange(Expression<Func<TInput, TContextIn, TContextOut>> transition) {
 			this.transition = transition;
 		}
 
 		public override Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
 			saveContext = true;
 			var transition = emitter.ReplaceBuildersByIds(this.transition);
-			var varContext = transition.Parameters[0];
+			var varInput = transition.Parameters[0];
+			var varContext = transition.Parameters[1];
 			return base.Emit(emitter,
-					Expression.Block(new[] {varContext},
+					Expression.Block(new[] {varInput, varContext},
+							Expression.Assign(varInput, emitter.InputParameter),
 							Expression.Assign(varContext, contextExpression),
 							transition.Body), ref saveContext);
 		}

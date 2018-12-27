@@ -10,11 +10,11 @@ namespace Sirius.StateMachine {
 		/// <summary>When a given input is matched, consume it and proceed.</summary>
 		/// <typeparam name="TComparand">Type of the comparand.</typeparam>
 		/// <typeparam name="TInput">Type of the input.</typeparam>
-		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <typeparam name="TContext">Type of the context.</typeparam>
 		/// <param name="that">The builder to act on.</param>
 		/// <param name="input">The input.</param>
 		/// <returns>A StateSwitchBuilder&lt;TInput,TData&gt;</returns>
-		public static StateSwitchBuilder<TComparand, TInput, TData> Take<TComparand, TInput, TData>(this StateSwitchBuilder<TComparand, TInput, TData> that, TComparand input)
+		public static StateSwitchBuilder<TComparand, TInput, TContext> Take<TComparand, TInput, TContext>(this StateSwitchBuilder<TComparand, TInput, TContext> that, TComparand input)
 				where TComparand: IEquatable<TComparand> {
 			return that.On(input).Yield();
 		}
@@ -23,11 +23,11 @@ namespace Sirius.StateMachine {
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <typeparam name="TComparand">Type of the comparand.</typeparam>
 		/// <typeparam name="TInput">Type of the input.</typeparam>
-		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <typeparam name="TContext">Type of the context.</typeparam>
 		/// <param name="that">The builder to act on.</param>
 		/// <param name="inputs">The inputs.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
-		public static StatePerformBuilder<TComparand, TInput, TData> OnSequence<TComparand, TInput, TData>(this StateSwitchBuilder<TComparand, TInput, TData> that, IEnumerable<TComparand> inputs)
+		public static StatePerformBuilder<TComparand, TInput, TContext> OnSequence<TComparand, TInput, TContext>(this StateSwitchBuilder<TComparand, TInput, TContext> that, IEnumerable<TComparand> inputs)
 				where TComparand: IEquatable<TComparand> {
 			using (var enumerator = inputs.GetEnumerator()) {
 				if (!enumerator.MoveNext()) {
@@ -44,11 +44,11 @@ namespace Sirius.StateMachine {
 		/// <summary>When a given input sequence is matched, consume the input except for the last one.</summary>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <typeparam name="TInput">Type of the input.</typeparam>
-		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <typeparam name="TContext">Type of the context.</typeparam>
 		/// <param name="that">The builder to act on.</param>
 		/// <param name="inputs">The inputs.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
-		public static StatePerformBuilder<RangeSet<TInput>, TInput, TData> OnSequence<TInput, TData>(this StateSwitchBuilder<RangeSet<TInput>, TInput, TData> that, IEnumerable<TInput> inputs)
+		public static StatePerformBuilder<RangeSet<TInput>, TInput, TContext> OnSequence<TInput, TContext>(this StateSwitchBuilder<RangeSet<TInput>, TInput, TContext> that, IEnumerable<TInput> inputs)
 				where TInput: IComparable<TInput> {
 			return OnSequence(that, inputs.Select(i => new RangeSet<TInput>(i)));
 		}

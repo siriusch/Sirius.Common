@@ -2,13 +2,13 @@ using System;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal abstract class PerformActionBase<TComparand, TInput, TDataIn, TDataOut>: IPerform<TComparand, TInput, TDataIn>
+	internal abstract class PerformActionBase<TComparand, TInput, TContextIn, TContextOut>: IPerform<TComparand, TInput, TContextIn>
 			where TComparand: IEquatable<TComparand> {
 		protected PerformActionBase() {
-			this.Next = new StatePerformBuilder<TComparand, TInput, TDataOut>();
+			this.Next = new StatePerformBuilder<TComparand, TInput, TContextOut>();
 		}
 
-		public StatePerformBuilder<TComparand, TInput, TDataOut> Next {
+		public StatePerformBuilder<TComparand, TInput, TContextOut> Next {
 			get;
 		}
 

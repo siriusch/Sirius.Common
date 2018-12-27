@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace Sirius.StateMachine {
-	internal class PerformInputDynamic<TComparand, TInput, TData>: IPerform<TComparand, TInput, TData>
+	internal class PerformInputDynamic<TComparand, TInput, TContext>: IPerform<TComparand, TInput, TContext>
 			where TComparand: IEquatable<TComparand> {
-		private readonly Expression<Func<TInput, TData, int>> computeState;
+		private readonly Expression<Func<TInput, TContext, int>> computeState;
 
-		public PerformInputDynamic(Expression<Func<TInput, TData, int>> computeState, bool yield) {
+		public PerformInputDynamic(Expression<Func<TInput, TContext, int>> computeState, bool yield) {
 			this.computeState = computeState;
 			this.Yield = yield;
 		}
