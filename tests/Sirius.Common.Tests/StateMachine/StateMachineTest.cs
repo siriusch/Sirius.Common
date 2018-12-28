@@ -51,7 +51,7 @@ namespace Sirius.StateMachine {
 			var root = new StateSwitchBuilder<RangeSet<char>, char, ITestOutputHelper>();
 			var emitter = new StateMachineEmitter<RangeSet<char>, char>(root, RangesConditionEmitter<RangeSet<char>, char>.Default);
 			root.OnSequence("test").Do(o => o.WriteLine("Done")).Yield(-2);
-			root.On(new RangeSet<char>(" \t\r\n")).Yield(data => (int)root);
+			root.On(new RangeSet<char>(" \t\r\n")).Yield(o => (int)root);
 			var stateExpr = emitter.Emit();
 			var stateFn = stateExpr.Compile();
 			var state = 0;

@@ -20,6 +20,11 @@ namespace Sirius.StateMachine {
 			}
 		}
 
+		/// <summary>Statically continue processing at the given state when new input is received.</summary>
+		public void Break() {
+			this.Perform = new PerformConstant<TComparand, TInput, TContext>(null, true);
+		}
+
 		/// <summary>Perform the given action (independent of input).</summary>
 		/// <param name="action">The action.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
@@ -34,15 +39,6 @@ namespace Sirius.StateMachine {
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
 		public StatePerformBuilder<TComparand, TInput, TContext> Do(Expression<Action<TInput, TContext>> action) {
 			var link = new PerformInputAction<TComparand, TInput, TContext>(action);
-			this.Perform = link;
-			return link.Next;
-		}
-
-		/// <summary>Perform the given action.</summary>
-		/// <param name="action">The action.</param>
-		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
-		public StatePerformBuilder<TComparand, TInput, TContext> State(Expression<Action<int, TContext>> action) {
-			var link = new PerformStateAction<TComparand, TInput, TContext>(action);
 			this.Perform = link;
 			return link.Next;
 		}
@@ -67,17 +63,7 @@ namespace Sirius.StateMachine {
 			return link.Next;
 		}
 
-		/// <summary>Perform the given data transition.</summary>
-		/// <typeparam name="TDataOut">Type of the data out.</typeparam>
-		/// <param name="transitionChangeData">Information describing the transition change.</param>
-		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
-		public StatePerformBuilder<TComparand, TInput, TDataOut> State<TDataOut>(Expression<Func<int, TContext, TDataOut>> transitionChangeData) {
-			var link = new PerformStateTransition<TComparand, TInput, TContext, TDataOut>(transitionChangeData);
-			this.Perform = link;
-			return link.Next;
-		}
-
-		internal Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression) {
+		internal Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, ParameterExpression contextExpression) {
 			var saveContext = false;
 			return this.Emit(emitter, contextExpression, ref saveContext);
 		}
@@ -115,6 +101,25 @@ namespace Sirius.StateMachine {
 			this.Perform = new PerformConstant<TComparand, TInput, TContext>(target, false);
 		}
 
+		/// <summary>Perform the given action.</summary>
+		/// <param name="action">The action.</param>
+		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
+		public StatePerformBuilder<TComparand, TInput, TContext> State(Expression<Action<int, TContext>> action) {
+			var link = new PerformStateAction<TComparand, TInput, TContext>(action);
+			this.Perform = link;
+			return link.Next;
+		}
+
+		/// <summary>Perform the given data transition.</summary>
+		/// <typeparam name="TDataOut">Type of the data out.</typeparam>
+		/// <param name="transitionChangeData">Information describing the transition change.</param>
+		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
+		public StatePerformBuilder<TComparand, TInput, TDataOut> State<TDataOut>(Expression<Func<int, TContext, TDataOut>> transitionChangeData) {
+			var link = new PerformStateTransition<TComparand, TInput, TContext, TDataOut>(transitionChangeData);
+			this.Perform = link;
+			return link.Next;
+		}
+
 		/// <summary>Dynamically continue processing at the given state when new input is received.</summary>
 		/// <param name="computeState">An <see cref="Expression" /> which returns the next state as integer.</param>
 		/// <remarks>Use <see cref="StateMachineEmitter{TComparand, TInput}.GetIdForBuilder" /> to find the ID of a specific state.</remarks>
@@ -150,11 +155,6 @@ namespace Sirius.StateMachine {
 			var result = new StateSwitchBuilder<TComparand, TInput, TContext>();
 			this.Yield(result);
 			return result;
-		}
-
-		/// <summary>Statically continue processing at the given state when new input is received.</summary>
-		public void Break() {
-			this.Perform = new PerformConstant<TComparand, TInput, TContext>(null, true);
 		}
 	}
 }

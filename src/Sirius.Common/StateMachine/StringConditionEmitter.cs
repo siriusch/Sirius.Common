@@ -7,14 +7,19 @@ namespace Sirius.StateMachine {
 	public class StringConditionEmitter: IConditionEmitter<string, string> {
 		/// <summary>Current culture string condition emitter.</summary>
 		public static readonly StringConditionEmitter CurrentCulture = new StringConditionEmitter(StringComparison.CurrentCulture);
+
 		/// <summary>Current culture (ignoring case) string condition emitter.</summary>
 		public static readonly StringConditionEmitter CurrentCultureIgnoreCase = new StringConditionEmitter(StringComparison.CurrentCultureIgnoreCase);
+
 		/// <summary>Invariant string condition emitter.</summary>
 		public static readonly StringConditionEmitter InvariantCulture = new StringConditionEmitter(StringComparison.InvariantCulture);
+
 		/// <summary>Invariant (ignoring case) string condition emitter.</summary>
 		public static readonly StringConditionEmitter InvariantCultureIgnoreCase = new StringConditionEmitter(StringComparison.InvariantCultureIgnoreCase);
+
 		/// <summary>Ordinal string condition emitter.</summary>
 		public static readonly StringConditionEmitter Ordinal = new StringConditionEmitter(StringComparison.Ordinal);
+
 		/// <summary>Ordinal (ignoring case) string condition emitter.</summary>
 		public static readonly StringConditionEmitter OrdinalIgnoreCase = new StringConditionEmitter(StringComparison.OrdinalIgnoreCase);
 

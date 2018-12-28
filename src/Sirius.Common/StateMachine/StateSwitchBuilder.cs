@@ -47,11 +47,15 @@ namespace Sirius.StateMachine {
 						pair.Value.Emit(emitter, varContext),
 						result);
 			}
-			return Expression.Block(new[] {varContext},
-					Expression.Assign(
-							varContext,
-							Expression.Convert(emitter.ContextParameter, typeof(TContext))),
-					result);
+			var usageFinder = new ParameterUsageFinder();
+			usageFinder.Visit(result);
+			return usageFinder.IsUsed(varContext)
+					? Expression.Block(new[] {varContext},
+							Expression.Assign(
+									varContext,
+									Expression.Convert(emitter.ContextParameter, typeof(TContext))),
+							result)
+					: result;
 		}
 
 		/// <summary>The perform chain when the input falls within the given range set.</summary>

@@ -12,10 +12,10 @@ namespace Sirius.StateMachine {
 	/// <typeparam name="TInput">Type of the input.</typeparam>
 	public class StateMachineEmitter<TComparand, TInput>
 			where TComparand: IEquatable<TComparand> {
-		private readonly Dictionary<int, StateSwitchBuilder<TComparand, TInput>> switchStateIds = new Dictionary<int, StateSwitchBuilder<TComparand, TInput>>();
-		private readonly Dictionary<StateSwitchBuilder<TComparand, TInput>, int> switchStates = new Dictionary<StateSwitchBuilder<TComparand, TInput>, int>(ReferenceEqualityComparer<StateSwitchBuilder<TComparand, TInput>>.Default);
 		private readonly List<Expression> onEnter = new List<Expression>();
 		private readonly List<Expression> onLeave = new List<Expression>();
+		private readonly Dictionary<int, StateSwitchBuilder<TComparand, TInput>> switchStateIds = new Dictionary<int, StateSwitchBuilder<TComparand, TInput>>();
+		private readonly Dictionary<StateSwitchBuilder<TComparand, TInput>, int> switchStates = new Dictionary<StateSwitchBuilder<TComparand, TInput>, int>(ReferenceEqualityComparer<StateSwitchBuilder<TComparand, TInput>>.Default);
 
 		/// <summary>Constructor.</summary>
 		/// <exception cref="ArgumentNullException">Thrown when one or more required arguments are <c>null</c></exception>
@@ -56,49 +56,6 @@ namespace Sirius.StateMachine {
 			get;
 		}
 
-		private Expression InvokeIfMatchingContext<TContext>(Expression<Action<TInput, TContext>> action) {
-			var parInput = action.Parameters[0];
-			var parContext = action.Parameters[1];
-			if (typeof(TContext) == typeof(object)) {
-				return Expression.Block(new[] { parInput, parContext },
-						Expression.Assign(parInput, this.InputParameter),
-						Expression.Assign(parContext, this.ContextParameter),
-						action.Body);
-			}
-			if (typeof(TContext).IsValueType) {
-				return Expression.IfThen(
-						Expression.TypeIs(this.ContextParameter, typeof(TContext)),
-						Expression.Block(new[] { parInput, parContext },
-								Expression.Assign(parInput, this.InputParameter),
-								Expression.Assign(parContext,
-										Expression.Convert(this.ContextParameter, typeof(TContext))),
-								action.Body));
-			}
-			return Expression.Block(new[] {parInput, parContext},
-					Expression.IfThen(
-							Expression.NotEqual(
-									Expression.Assign(
-											parContext,
-											Expression.TypeAs(this.ContextParameter, typeof(TContext))),
-									Expression.Constant(null, typeof(TContext))),
-							action.Body));
-		}
-
-		/// <summary>Adds an action to execute for a specific context type upon entering the state machine.</summary>
-		/// <typeparam name="TData">Type of the data.</typeparam>
-		/// <param name="action">The action.</param>
-		/// <remarks>A Goto will not trigger a second execution.</remarks>
-		public void OnEnter<TData>(Expression<Action<TInput, TData>> action) {
-			this.onEnter.Add(this.InvokeIfMatchingContext(action));
-		}
-
-		/// <summary>Adds an action to execute for a specific context type upon leaving the state machine (on yield).</summary>
-		/// <typeparam name="TData">Type of the data.</typeparam>
-		/// <param name="action">The action.</param>
-		public void OnLeave<TData>(Expression<Action<TInput, TData>> action) {
-			this.onLeave.Add(this.InvokeIfMatchingContext(action));
-		}
-
 		/// <summary>Gets the root.</summary>
 		/// <value>The root.</value>
 		public StateSwitchBuilder<TComparand, TInput> Root {
@@ -135,8 +92,8 @@ namespace Sirius.StateMachine {
 							cases)));
 			body.AddRange(this.onLeave);
 			body.Add(Expression.GreaterThanOrEqual(
-							this.StateParameter,
-							Expression.Constant(0)));
+					this.StateParameter,
+					Expression.Constant(0)));
 			return Expression.Lambda<StateMachineFunc<TInput>>(
 					Expression.Block(body),
 					this.InputParameter,
@@ -154,6 +111,42 @@ namespace Sirius.StateMachine {
 				this.switchStateIds.Add(value, switchState);
 			}
 			return value;
+		}
+
+		private Expression InvokeIfMatchingContext<TContext>(Expression<Action<TInput, TContext>> action) {
+			if (typeof(TContext) == typeof(object)) {
+				return this.ReplaceBuildersByIds(action, this.InputParameter, this.ContextParameter).Body;
+			}
+			var parContext = action.Parameters[1];
+			if (typeof(TContext).IsValueType) {
+				return Expression.IfThen(
+						Expression.TypeIs(this.ContextParameter, typeof(TContext)),
+						Expression.Block(new[] {parContext},
+								Expression.Assign(parContext,
+										Expression.Convert(this.ContextParameter, typeof(TContext))), this.ReplaceBuildersByIds(action, this.InputParameter).Body));
+			}
+			return Expression.Block(new[] {parContext},
+					Expression.IfThen(
+							Expression.NotEqual(
+									Expression.Assign(
+											parContext,
+											Expression.TypeAs(this.ContextParameter, typeof(TContext))),
+									Expression.Constant(null, typeof(TContext))), this.ReplaceBuildersByIds(action, this.InputParameter).Body));
+		}
+
+		/// <summary>Adds an action to execute for a specific context type upon entering the state machine.</summary>
+		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <param name="action">The action.</param>
+		/// <remarks>A Goto will not trigger a second execution.</remarks>
+		public void OnEnter<TData>(Expression<Action<TInput, TData>> action) {
+			this.onEnter.Add(this.InvokeIfMatchingContext(action));
+		}
+
+		/// <summary>Adds an action to execute for a specific context type upon leaving the state machine (on yield).</summary>
+		/// <typeparam name="TData">Type of the data.</typeparam>
+		/// <param name="action">The action.</param>
+		public void OnLeave<TData>(Expression<Action<TInput, TData>> action) {
+			this.onLeave.Add(this.InvokeIfMatchingContext(action));
 		}
 
 		/// <summary>Replace builders by identifier.</summary>
@@ -183,13 +176,13 @@ namespace Sirius.StateMachine {
 		/// <summary>Constructor.</summary>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <param name="conditionEmitter">The condition emitter.</param>
-		public StateMachineEmitter([NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): this(new StateSwitchBuilder<TComparand, TInput, TRootData>(), conditionEmitter) {}
+		public StateMachineEmitter([NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): this(new StateSwitchBuilder<TComparand, TInput, TRootData>(), conditionEmitter) { }
 
 		/// <summary>Constructor.</summary>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <param name="root">The root.</param>
 		/// <param name="conditionEmitter">The condition emitter.</param>
-		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput, TRootData> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): base(root, conditionEmitter) {}
+		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput, TRootData> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): base(root, conditionEmitter) { }
 
 		/// <summary>Gets the root.</summary>
 		/// <value>The root.</value>
