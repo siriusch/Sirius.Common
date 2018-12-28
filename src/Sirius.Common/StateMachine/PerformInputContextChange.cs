@@ -11,6 +11,7 @@ namespace Sirius.StateMachine {
 		}
 
 		public override Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
+			emitter.AssertCanChangeContext();
 			saveContext = true;
 			return base.Emit(emitter, emitter.ReplaceBuildersByIds(this.transition, emitter.InputParameter, contextExpression).Body, ref saveContext);
 		}

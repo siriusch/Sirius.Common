@@ -101,7 +101,7 @@
     <Compile Include="StateMachine\PerformInputContextChange.cs" />
     <Compile Include="StateMachine\PerformInputDynamic.cs" />
     <Compile Include="StateMachine\PerformStateAction.cs" />
-    <Compile Include="StateMachine\PerformStateTransition.cs" />
+    <Compile Include="StateMachine\PerformStateContextChange.cs" />
     <Compile Include="StateMachine\PerformStatic.cs" />
     <Compile Include="StateMachine\RangeConditionEmitter.cs" />
     <Compile Include="StateMachine\RangesConditionEmitter.cs" />

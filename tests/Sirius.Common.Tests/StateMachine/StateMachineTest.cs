@@ -63,6 +63,17 @@ namespace Sirius.StateMachine {
 		}
 
 		[Fact]
+		public void TestTypedContext() {
+			var emitter = new StateMachineEmitter<char, char, ITestOutputHelper>(EquatableConditionEmitter<char>.Default);
+			emitter.Root.Default.Do((ch, ctx) => ctx.WriteLine(ch.ToString())).Yield();
+			var stateExpr = emitter.Emit();
+			var stateFn = stateExpr.Compile();
+			var state = 0;
+			stateFn('X', ref state, this.output);
+			Assert.NotEqual(0, state);
+		}
+
+		[Fact]
 		public void ExpressionReplaceTest() {
 			var root = new StateSwitchBuilder<bool, bool, ITestOutputHelper>();
 			var emitter = new StateMachineEmitter<bool, bool>(root, EquatableConditionEmitter<bool>.Default);

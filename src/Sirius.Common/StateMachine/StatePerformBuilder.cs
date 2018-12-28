@@ -115,7 +115,7 @@ namespace Sirius.StateMachine {
 		/// <param name="transitionChangeData">Information describing the transition change.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
 		public StatePerformBuilder<TComparand, TInput, TDataOut> State<TDataOut>(Expression<Func<int, TContext, TDataOut>> transitionChangeData) {
-			var link = new PerformStateTransition<TComparand, TInput, TContext, TDataOut>(transitionChangeData);
+			var link = new PerformStateContextChange<TComparand, TInput, TContext, TDataOut>(transitionChangeData);
 			this.Perform = link;
 			return link.Next;
 		}

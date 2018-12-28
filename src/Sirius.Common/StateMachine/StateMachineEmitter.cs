@@ -22,12 +22,20 @@ namespace Sirius.StateMachine {
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <param name="root">The root.</param>
 		/// <param name="conditionEmitter">The condition emitter.</param>
-		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter) {
+		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): this(root, conditionEmitter, null) { }
+
+		/// <summary>Constructor.</summary>
+		/// <exception cref="ArgumentNullException">Thrown when one or more required arguments are <c>null</c></exception>
+		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
+		/// <param name="root">The root.</param>
+		/// <param name="conditionEmitter">The condition emitter.</param>
+		/// <param name="contextType">Type of the context.</param>
+		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter, Type contextType) {
 			this.Root = root ?? throw new ArgumentNullException(nameof(root));
 			this.ConditionEmitter = conditionEmitter ?? throw new ArgumentNullException(nameof(conditionEmitter));
 			this.InputParameter = Expression.Parameter(typeof(TInput), "input");
 			this.StateParameter = Expression.Parameter(typeof(int).MakeByRefType(), "state");
-			this.ContextParameter = Expression.Parameter(typeof(object).MakeByRefType(), "context");
+			this.ContextParameter = Expression.Parameter(contextType ?? typeof(object).MakeByRefType(), "context");
 			this.StartLabel = Expression.Label("start");
 			if (this.GetIdForBuilder(this.Root) != 0) {
 				throw new InvalidOperationException("Internal error: Unexpected root ID");
@@ -69,9 +77,23 @@ namespace Sirius.StateMachine {
 			set;
 		} = -1;
 
-		/// <summary>Emit the state machine.</summary>
+		internal void AssertCanChangeContext() {
+			if (!this.ContextParameter.IsByRef) {
+				throw new InvalidOperationException("The context cannot be reset");
+			}
+		}
+
+		/// <summary>Emit the state machine function.</summary>
 		/// <returns>An Expression&lt;StateMachineFunc&lt;TInput&gt;&gt;</returns>
 		public Expression<StateMachineFunc<TInput>> Emit() {
+			return Expression.Lambda<StateMachineFunc<TInput>>(this.EmitBody(),
+					this.InputParameter,
+					this.StateParameter,
+					this.ContextParameter);
+		}
+
+		/// <summary>Emit the state machine body.</summary>
+		protected Expression EmitBody() {
 			var cases = new List<SwitchCase>();
 			for (var state = 0; state < this.switchStateIds.Count; state++) {
 				// Note: Additional switchStates may be added by the call to builder.Emit() during iteration!
@@ -94,11 +116,7 @@ namespace Sirius.StateMachine {
 			body.Add(Expression.GreaterThanOrEqual(
 					this.StateParameter,
 					Expression.Constant(0)));
-			return Expression.Lambda<StateMachineFunc<TInput>>(
-					Expression.Block(body),
-					this.InputParameter,
-					this.StateParameter,
-					this.ContextParameter);
+			return Expression.Block(body);
 		}
 
 		/// <summary>Gets the state ID associated with a builder.</summary>
@@ -114,7 +132,7 @@ namespace Sirius.StateMachine {
 		}
 
 		private Expression InvokeIfMatchingContext<TContext>(Expression<Action<TInput, TContext>> action) {
-			if (typeof(TContext) == typeof(object)) {
+			if (typeof(TContext) == this.ContextParameter.Type) {
 				return this.ReplaceBuildersByIds(action, this.InputParameter, this.ContextParameter).Body;
 			}
 			var parContext = action.Parameters[1];
@@ -170,22 +188,32 @@ namespace Sirius.StateMachine {
 	/// <summary>A state machine emitter.</summary>
 	/// <typeparam name="TComparand">Type of the comparand.</typeparam>
 	/// <typeparam name="TInput">Type of the input.</typeparam>
-	/// <typeparam name="TRootData">Type of the data of the root.</typeparam>
-	public class StateMachineEmitter<TComparand, TInput, TRootData>: StateMachineEmitter<TComparand, TInput>
-			where TComparand: IEquatable<TComparand> {
+	/// <typeparam name="TContext">Type of the read-only context.</typeparam>
+	public class StateMachineEmitter<TComparand, TInput, TContext>: StateMachineEmitter<TComparand, TInput>
+			where TComparand: IEquatable<TComparand>
+			where TContext: class {
 		/// <summary>Constructor.</summary>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <param name="conditionEmitter">The condition emitter.</param>
-		public StateMachineEmitter([NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): this(new StateSwitchBuilder<TComparand, TInput, TRootData>(), conditionEmitter) { }
+		public StateMachineEmitter([NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): this(new StateSwitchBuilder<TComparand, TInput, TContext>(), conditionEmitter) { }
 
 		/// <summary>Constructor.</summary>
 		/// <exception cref="InvalidOperationException">Thrown when the requested operation is invalid.</exception>
 		/// <param name="root">The root.</param>
 		/// <param name="conditionEmitter">The condition emitter.</param>
-		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput, TRootData> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): base(root, conditionEmitter) { }
+		public StateMachineEmitter([NotNull] StateSwitchBuilder<TComparand, TInput, TContext> root, [NotNull] IConditionEmitter<TComparand, TInput> conditionEmitter): base(root, conditionEmitter, typeof(TContext)) { }
 
 		/// <summary>Gets the root.</summary>
 		/// <value>The root.</value>
-		public new StateSwitchBuilder<TComparand, TInput, TRootData> Root => (StateSwitchBuilder<TComparand, TInput, TRootData>)base.Root;
+		public new StateSwitchBuilder<TComparand, TInput, TContext> Root => (StateSwitchBuilder<TComparand, TInput, TContext>)base.Root;
+
+		/// <summary>Emit the state machine function.</summary>
+		/// <returns>An Expression&lt;StateMachineFunc&lt;TInput&gt;&gt;</returns>
+		public new Expression<StateMachineFunc<TInput, TContext>> Emit() {
+			return Expression.Lambda<StateMachineFunc<TInput, TContext>>(this.EmitBody(),
+					this.InputParameter,
+					this.StateParameter,
+					this.ContextParameter);
+		}
 	}
 }

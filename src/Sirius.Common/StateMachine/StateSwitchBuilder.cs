@@ -39,7 +39,10 @@ namespace Sirius.StateMachine {
 		} = new StatePerformBuilder<TComparand, TInput, TContext>();
 
 		internal override Expression Emit(StateMachineEmitter<TComparand, TInput> emitter) {
-			var varContext = Expression.Variable(typeof(TContext), "typedContext");
+			var usesContextVariable = (emitter.ContextParameter.Type != typeof(TContext));
+			var varContext = usesContextVariable
+					? Expression.Variable(typeof(TContext), "typedContext")
+					: emitter.ContextParameter;
 			var result = this.Default.Emit(emitter, varContext);
 			foreach (var pair in this.onMatch) {
 				result = Expression.Condition(
@@ -47,9 +50,12 @@ namespace Sirius.StateMachine {
 						pair.Value.Emit(emitter, varContext),
 						result);
 			}
-			var usageFinder = new ParameterUsageFinder();
-			usageFinder.Visit(result);
-			return usageFinder.IsUsed(varContext)
+			if (usesContextVariable) {
+				var usageFinder = new ParameterUsageFinder();
+				usageFinder.Visit(result);
+				usesContextVariable = usageFinder.IsUsed(varContext);
+			}
+			return usesContextVariable
 					? Expression.Block(new[] {varContext},
 							Expression.Assign(
 									varContext,
