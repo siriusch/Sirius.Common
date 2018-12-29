@@ -5,7 +5,7 @@
 		<version>1.0.0</version>
 		<authors>siriusch</authors>
 		<owners>siriusch</owners>
-		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+		<license type="expression">MIT</license>
 		<projectUrl>https://github.com/siriusch/Sirius.Common</projectUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>.NET Library with types and functions used by other Sirius projects</description>
