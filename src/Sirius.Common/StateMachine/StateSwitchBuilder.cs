@@ -21,6 +21,18 @@ namespace Sirius.StateMachine {
 	/// <typeparam name="TContext">Type of the context.</typeparam>
 	public sealed class StateSwitchBuilder<TComparand, TInput, TContext>: StateSwitchBuilder<TComparand, TInput>
 			where TComparand: IEquatable<TComparand> {
+		private struct MatchCase {
+			public readonly TComparand comparand;
+			public readonly Expression<Predicate<TContext>> condition;
+			public readonly StatePerformBuilder<TComparand, TInput, TContext> builder;
+
+			public MatchCase(TComparand comparand, Expression<Predicate<TContext>> condition, StatePerformBuilder<TComparand, TInput, TContext> builder) {
+				this.comparand = comparand;
+				this.condition = condition;
+				this.builder = builder;
+			}
+		}
+
 		/// <summary>Explicit cast that converts the given StateSwitchBuilder&lt;TComparand,TInput,TData&gt; to an int.</summary>
 		/// <exception cref="NotSupportedException">Thrown when the requested operation is not supported.</exception>
 		/// <param name="builder">The builder.</param>
@@ -30,7 +42,7 @@ namespace Sirius.StateMachine {
 			throw new NotSupportedException("This conversion is not supported at runtime");
 		}
 
-		private readonly List<KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TContext>>> onMatch = new List<KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TContext>>>();
+		private readonly List<MatchCase> onMatch = new List<MatchCase>();
 
 		/// <summary>The default perform chain (if none of the inputs matched).</summary>
 		/// <value>The default builder.</value>
@@ -45,9 +57,15 @@ namespace Sirius.StateMachine {
 					: emitter.ContextParameter;
 			var result = this.Default.Emit(emitter, varContext);
 			foreach (var pair in this.onMatch) {
+				var condition = emitter.ConditionEmitter.Emit(pair.comparand, emitter.InputParameter);
+				if (pair.condition != null) {
+					condition = Expression.AndAlso(
+							condition,
+							emitter.ReplaceBuildersByIds(pair.condition, varContext).Body);
+				}
 				result = Expression.Condition(
-						emitter.ConditionEmitter.Emit(pair.Key, emitter.InputParameter),
-						pair.Value.Emit(emitter, varContext),
+						condition,
+						pair.builder.Emit(emitter, varContext),
 						result);
 			}
 			if (usesContextVariable) {
@@ -69,9 +87,18 @@ namespace Sirius.StateMachine {
 		/// <param name="input">The input range set.</param>
 		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
 		public StatePerformBuilder<TComparand, TInput, TContext> On(TComparand input) {
+			return this.On(input, default(Expression<Predicate<TContext>>));
+		}
+
+		/// <summary>The perform chain when the input falls within the given range set.</summary>
+		/// <exception cref="ArgumentException">Thrown when one or more arguments have unsupported or illegal values.</exception>
+		/// <param name="input">The input range set.</param>
+		/// <param name="condition">The condition.</param>
+		/// <returns>A StatePerformBuilder&lt;TInput,TData&gt;</returns>
+		public StatePerformBuilder<TComparand, TInput, TContext> On(TComparand input, Expression<Predicate<TContext>> condition) {
 			foreach (var pair in this.onMatch) {
-				if (pair.Key.Equals(input)) {
-					return pair.Value;
+				if (pair.comparand.Equals(input) && (pair.condition == condition)) {
+					return pair.builder;
 				}
 			}
 			var result = new StatePerformBuilder<TComparand, TInput, TContext>();
@@ -83,7 +110,15 @@ namespace Sirius.StateMachine {
 		/// <param name="input">The input range set.</param>
 		/// <param name="perform">The perform.</param>
 		public void On(TComparand input, StatePerformBuilder<TComparand, TInput, TContext> perform) {
-			this.onMatch.Add(new KeyValuePair<TComparand, StatePerformBuilder<TComparand, TInput, TContext>>(input, perform));
+			this.On(input, null, perform);
+		}
+
+		/// <summary>The perform chain when the input falls within the given range set.</summary>
+		/// <param name="input">The input range set.</param>
+		/// <param name="condition">The condition.</param>
+		/// <param name="perform">The perform.</param>
+		public void On(TComparand input, Expression<Predicate<TContext>> condition, StatePerformBuilder<TComparand, TInput, TContext> perform) {
+			this.onMatch.Add(new MatchCase(input, condition, perform));
 		}
 	}
 }

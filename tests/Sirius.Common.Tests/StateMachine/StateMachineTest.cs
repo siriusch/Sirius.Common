@@ -22,6 +22,7 @@ namespace Sirius.StateMachine {
 		public void TestCounter(int expectedCount, string input) {
 			// Define the state machine
 			var root = new StateSwitchBuilder<char, char, int>();
+			root.On('\n', i => false);
 			root.On('\n').Do(i => i + 1).Yield(root);
 			root.Default.Yield(root);
 			// Compile the state machine
