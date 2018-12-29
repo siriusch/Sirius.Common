@@ -25,6 +25,7 @@ namespace Sirius.StateMachine {
 			// Define the state machine
 			var root = new StateSwitchBuilder<char, char, int>();
 			root.On('\n', i => false);
+			root.On((i, ctx) => false);
 			root.On('\n').Do(i => i + 1).Yield(root);
 			root.Default.Yield(root);
 			// Compile the state machine

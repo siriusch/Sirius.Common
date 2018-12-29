@@ -91,6 +91,9 @@
     <Compile Include="StateMachine\EquatableConditionEmitter.cs" />
     <Compile Include="StateMachine\IConditionEmitter.cs" />
     <Compile Include="StateMachine\IPerform.cs" />
+    <Compile Include="StateMachine\MatchCase.cs" />
+    <Compile Include="StateMachine\MatchComparandCase.cs" />
+    <Compile Include="StateMachine\MatchCustomCase.cs" />
     <Compile Include="StateMachine\ParameterUsageFinder.cs" />
     <Compile Include="StateMachine\PerformAction.cs" />
     <Compile Include="StateMachine\PerformActionBase.cs" />
