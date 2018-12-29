@@ -17,6 +17,11 @@ namespace Sirius.StateMachine {
 		/// <param name="varInput">The variable input.</param>
 		/// <returns>An Expression.</returns>
 		public Expression Emit(TInput comparand, ParameterExpression varInput) {
+			if (typeof(TInput).IsPrimitive) {
+				return Expression.Equal(
+						varInput,
+						Expression.Constant(comparand));
+			}
 			return Expression.Call(
 					Expression.Constant(comparand),
 					meth_IEquatable_Equals,
