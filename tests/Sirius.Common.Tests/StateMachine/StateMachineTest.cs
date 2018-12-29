@@ -1,6 +1,8 @@
 using System;
 using System.Linq.Expressions;
 
+using AgileObjects.ReadableExpressions;
+
 using Sirius.Collections;
 
 using Xunit;
@@ -30,6 +32,7 @@ namespace Sirius.StateMachine {
 			emitter.OnEnter<object>((i, d) => this.output.WriteLine("+"));
 			emitter.OnLeave<object>((i, d) => this.output.WriteLine("-"));
 			var stateExpr = emitter.Emit();
+			this.output.WriteLine(stateExpr.ToReadableString());
 			var stateFn = stateExpr.Compile();
 			// Run the state machine for some input
 			var state = 0;
