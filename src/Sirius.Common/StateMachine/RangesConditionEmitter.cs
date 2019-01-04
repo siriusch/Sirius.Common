@@ -38,5 +38,15 @@ namespace Sirius.StateMachine {
 				return result;
 			}
 		}
+
+		/// <summary>
+		/// Check if two comparands are disjoint.
+		/// </summary>
+		/// <param name="x">First comparand.</param>
+		/// <param name="y">Second comparand.</param>
+		/// <returns><c>true</c> if the comparands are disjoint, <c>false</c> otherwise.</returns>
+		public bool IsDisjoint(TComparand x, TComparand y) {
+			return (new RangeSet<TInput>(x) & new RangeSet<TInput>(y)).IsEmpty;
+		}
 	}
 }

@@ -44,5 +44,15 @@ namespace Sirius.StateMachine {
 					varInput,
 					Expression.Constant(this.comparison));
 		}
+
+		/// <summary>
+		/// Check if two comparands are disjoint.
+		/// </summary>
+		/// <param name="x">First comparand.</param>
+		/// <param name="y">Second comparand.</param>
+		/// <returns><c>true</c> if the comparands are disjoint, <c>false</c> otherwise.</returns>
+		public bool IsDisjoint(string x, string y) {
+			return !string.Equals(x, y, this.comparison);
+		}
 	}
 }

@@ -63,5 +63,9 @@ namespace Sirius.StateMachine {
 										Expression.Constant(0)));
 			}
 		}
+
+		public bool IsDisjoint(Range<TInput> x, Range<TInput> y) {
+			return (x & y).IsEmpty;
+		}
 	}
 }

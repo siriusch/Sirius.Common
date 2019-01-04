@@ -27,5 +27,15 @@ namespace Sirius.StateMachine {
 					meth_IEquatable_Equals,
 					varInput);
 		}
+
+		/// <summary>
+		/// Check if two comparands are disjoint.
+		/// </summary>
+		/// <param name="x">First comparand.</param>
+		/// <param name="y">Second comparand.</param>
+		/// <returns><c>true</c> if the comparands are disjoint, <c>false</c> otherwise.</returns>
+		public bool IsDisjoint(TInput x, TInput y) {
+			return !x.Equals(y);
+		}
 	}
 }
