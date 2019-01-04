@@ -15,5 +15,9 @@ namespace Sirius.StateMachine {
 			saveContext = true;
 			return base.Emit(emitter, emitter.ReplaceBuildersByIds(this.transition, contextExpression).Body, ref saveContext);
 		}
+
+		public override bool Equals(IPerform<TComparand, TInput, TContextIn> other) {
+			return other is PerformContextChange<TComparand, TInput, TContextIn, TContextOut> otherTransition && (this.transition == otherTransition.transition) && base.Equals(other);
+		}
 	}
 }

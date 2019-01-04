@@ -15,5 +15,9 @@ namespace Sirius.StateMachine {
 					emitter.ReplaceBuildersByIds(this.action, contextExpression).Body,
 					base.Emit(emitter, contextExpression, ref saveContext));
 		}
+
+		public override bool Equals(IPerform<TComparand, TInput, TContext> other) {
+			return other is PerformAction<TComparand, TInput, TContext> otherAction && (this.action == otherAction.action) && base.Equals(other);
+		}
 	}
 }

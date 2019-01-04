@@ -37,5 +37,9 @@ namespace Sirius.StateMachine {
 			}
 			return Expression.Block(body);
 		}
+
+		public bool Equals(IPerform<TComparand, TInput, TContext> other) {
+			return other is PerformStatic<TComparand, TInput, TContext> otherConstant && this.Target == otherConstant.Target && this.Yield == otherConstant.Yield;
+		}
 	}
 }

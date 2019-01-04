@@ -15,5 +15,9 @@ namespace Sirius.StateMachine {
 		public virtual Expression Emit(StateMachineEmitter<TComparand, TInput> emitter, Expression contextExpression, ref bool saveContext) {
 			return this.Next.Emit(emitter, contextExpression, ref saveContext);
 		}
+
+		public virtual bool Equals(IPerform<TComparand, TInput, TContextIn> other) {
+			return other is PerformActionBase<TComparand, TInput, TContextIn, TContextOut> otherAction && this.Next.Perform.Equals(otherAction.Next.Perform);
+		}
 	}
 }

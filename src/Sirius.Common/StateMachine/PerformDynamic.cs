@@ -38,5 +38,9 @@ namespace Sirius.StateMachine {
 			}
 			return body.Count == 1 ? body[0] : Expression.Block(body);
 		}
+
+		public bool Equals(IPerform<TComparand, TInput, TContext> other) {
+			return other is PerformDynamic<TComparand, TInput, TContext> otherDynamic && this.computeState == otherDynamic.computeState && this.Yield == otherDynamic.Yield;
+		}
 	}
 }
