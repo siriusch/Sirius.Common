@@ -38,7 +38,15 @@ namespace Sirius.StateMachine {
 			return Expression.Block(body);
 		}
 
-		public bool Equals(IPerform<TComparand, TInput, TContext> other) {
+		public override int GetHashCode() {
+			return unchecked(GetType().GetHashCode() ^ (this.Target.GetHashCode() * 397) ^ (this.Yield.GetHashCode() * 122959073) ^ typeof(TContext).GetHashCode());
+		}
+
+		public sealed override bool Equals(object obj) {
+			return this.Equals(obj as IPerform<TComparand, TInput>);
+		}
+
+		public bool Equals(IPerform<TComparand, TInput> other) {
 			return other is PerformStatic<TComparand, TInput, TContext> otherConstant && this.Target == otherConstant.Target && this.Yield == otherConstant.Yield;
 		}
 	}

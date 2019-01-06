@@ -16,7 +16,11 @@ namespace Sirius.StateMachine {
 			return base.Emit(emitter, emitter.ReplaceBuildersByIds(this.transition, contextExpression).Body, ref saveContext);
 		}
 
-		public override bool Equals(IPerform<TComparand, TInput, TContextIn> other) {
+		public override int GetHashCode() {
+			return this.transition.GetHashCode() ^ base.GetHashCode();
+		}
+
+		public override bool Equals(IPerform<TComparand, TInput> other) {
 			return other is PerformContextChange<TComparand, TInput, TContextIn, TContextOut> otherTransition && (this.transition == otherTransition.transition) && base.Equals(other);
 		}
 	}

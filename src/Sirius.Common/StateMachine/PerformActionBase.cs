@@ -16,7 +16,15 @@ namespace Sirius.StateMachine {
 			return this.Next.Emit(emitter, contextExpression, ref saveContext);
 		}
 
-		public virtual bool Equals(IPerform<TComparand, TInput, TContextIn> other) {
+		public override int GetHashCode() {
+			return unchecked((GetType().GetHashCode() ^ this.Next.Perform.GetHashCode() * 397) ^ (typeof(TContextIn).GetHashCode() * 3) ^ typeof(TContextOut).GetHashCode());
+		}
+
+		public sealed override bool Equals(object obj) {
+			return this.Equals(obj as IPerform<TComparand, TInput>);
+		}
+
+		public virtual bool Equals(IPerform<TComparand, TInput> other) {
 			return other is PerformActionBase<TComparand, TInput, TContextIn, TContextOut> otherAction && this.Next.Perform.Equals(otherAction.Next.Perform);
 		}
 	}
