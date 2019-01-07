@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -46,12 +47,74 @@ namespace Sirius.StateMachine {
 			var varContext = usesContextVariable
 					? Expression.Variable(typeof(TContext), "typedContext")
 					: emitter.ContextParameter;
+			var cases = this.onMatch
+					.ToList();
+			var conditions = this.onMatch
+					.Select(c => c.EmitCondition(emitter, varContext))
+					.ToList();
+			var mergeLimit = this.onMatch
+					.Select(c => 0)
+					.ToList();
+			Debug.Assert(cases.Count == this.onMatch.Count && conditions.Count == this.onMatch.Count && mergeLimit.Count == this.onMatch.Count);
+			var checkDefault = true;
 			var result = this.Default.Emit(emitter, varContext);
-			for (var i = this.onMatch.Count - 1; i >= 0; i--) {
-				var matchCase = this.onMatch[i];
+			for (var i = cases.Count - 1; i >= 0; i--) {
+				var matchCase = cases[i];
+				var hasMatchComparand = matchCase.TryGetComparand(out var matchComparand);
+				if (checkDefault && matchCase.Builder.Perform.Equals(this.Default.Perform)) {
+					var useDefault = true;
+					if (hasMatchComparand) {
+						for (var j = i + 1; j < cases.Count; j++) {
+							var checkCase = cases[j];
+							if (checkCase.TryGetComparand(out var checkComparand) && !emitter.ConditionEmitter.IsDisjoint(matchComparand, checkComparand)) {
+								useDefault = false;
+								break;
+							}
+						}
+					}
+					if (useDefault) {
+						cases.RemoveAt(i);
+						conditions.RemoveAt(i);
+						mergeLimit.RemoveAt(i);
+						continue;
+					}
+				}
+				if (hasMatchComparand) {
+					var mergedWith = -1;
+					var limit = mergeLimit[i];
+					var j = i;
+					while (--j > limit) {
+						var checkCase = cases[j];
+						if (matchCase.Builder.Perform.Equals(checkCase.Builder.Perform)) {
+							// The two cases perform the same, try to optimize by merging with previous case
+							if (!(checkCase.TryGetComparand(out var checkComparand) && emitter.ConditionEmitter.IsDisjoint(matchComparand, checkComparand))) {
+								// Custom conditions (which may use input) or overlapping comparands are not safe to merge
+								break;
+							}
+							if (mergedWith < 0) {
+								// Not yet merged, do it
+								mergedWith = j;
+								conditions[j] = Expression.OrElse(
+										conditions[j],
+										conditions[i]);
+								cases.RemoveAt(i);
+								conditions.RemoveAt(i);
+								mergeLimit.RemoveAt(i);
+							}
+						}
+					}
+					if (mergedWith >= 0) {
+						// Keep track how far the new condition is mergeable
+						mergeLimit[mergedWith] = j;
+						continue;
+					}
+				} else {
+					// Custom case disallows default usage
+					checkDefault = false;
+				}
 				result = Expression.Condition(
-						matchCase.EmitCondition(emitter, varContext),
-						matchCase.Builder.Emit(emitter, varContext),
+						conditions[i],
+						this.onMatch[i].Builder.Emit(emitter, varContext),
 						result);
 			}
 			if (usesContextVariable) {

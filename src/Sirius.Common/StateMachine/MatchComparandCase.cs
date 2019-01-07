@@ -26,5 +26,10 @@ namespace Sirius.StateMachine {
 					condition,
 					emitter.ReplaceBuildersByIds(this.Condition, varContext).Body);
 		}
+
+		public override bool TryGetComparand(out TComparand comparand) {
+			comparand = this.Comparand;
+			return true;
+		}
 	}
 }

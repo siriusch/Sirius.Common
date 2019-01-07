@@ -17,5 +17,10 @@ namespace Sirius.StateMachine {
 		public override Expression EmitCondition(StateMachineEmitter<TComparand, TInput> emitter, ParameterExpression varContext) {
 			return emitter.ReplaceBuildersByIds(this.Condition, emitter.InputParameter, varContext).Body;
 		}
+
+		public override bool TryGetComparand(out TComparand comparand) {
+			comparand = default;
+			return false;
+		}
 	}
 }

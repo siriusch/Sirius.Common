@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 using JetBrains.Annotations;
@@ -97,6 +98,7 @@ namespace Sirius.StateMachine {
 			var cases = new List<SwitchCase>();
 			for (var state = 0; state < this.switchStateIds.Count; state++) {
 				// Note: Additional switchStates may be added by the call to builder.Emit() during iteration!
+				Debug.Assert(state == cases.Count); // the IDs should match the indexes
 				cases.Add(
 						Expression.SwitchCase(
 								this.switchStateIds[state].Emit(this),

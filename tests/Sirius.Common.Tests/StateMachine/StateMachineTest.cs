@@ -16,6 +16,49 @@ namespace Sirius.StateMachine {
 			this.output = output;
 		}
 
+		[Fact]
+		public void TestDefaultOptimization() {
+			// Define the state machine
+			var root = new StateSwitchBuilder<char, char, int>();
+			root.On('x', i => false).Yield(root);
+			root.On('a').Yield(root);
+			root.On('x').Do(i => i + 1).Yield(root);
+			root.On('b').Yield(root);
+			root.Default.Yield(root);
+			// Compile the state machine
+			var emitter = new StateMachineEmitter<char, char>(root, EquatableConditionEmitter<char>.Default);
+			var stateExpr = emitter.Emit();
+			this.output.WriteLine(stateExpr.ToReadableString());
+		}
+
+		[Fact]
+		public void TestMergeLimitOptimization() {
+			// Define the state machine
+			var root = new StateSwitchBuilder<char, char, int>();
+			root.On('x', i => false).Yield(root);
+			root.On('a').Yield(root);
+			root.On('x').Do(i => i + 1).Yield(root);
+			root.On('b').Yield(root);
+			// Compile the state machine
+			var emitter = new StateMachineEmitter<char, char>(root, EquatableConditionEmitter<char>.Default);
+			var stateExpr = emitter.Emit();
+			this.output.WriteLine(stateExpr.ToReadableString());
+		}
+
+		[Fact]
+		public void TestMergeOptimization() {
+			// Define the state machine
+			var root = new StateSwitchBuilder<char, char, int>();
+			root.On('x', i => false).Yield(root);
+			root.On('a').Yield(root);
+			root.On('x').Yield(root);
+			root.On('b').Yield(root);
+			// Compile the state machine
+			var emitter = new StateMachineEmitter<char, char>(root, EquatableConditionEmitter<char>.Default);
+			var stateExpr = emitter.Emit();
+			this.output.WriteLine(stateExpr.ToReadableString());
+		}
+
 		[Theory]
 		[InlineData(0, "test")]
 		[InlineData(1, "   te\nst")]

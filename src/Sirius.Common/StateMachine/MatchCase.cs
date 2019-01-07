@@ -15,5 +15,7 @@ namespace Sirius.StateMachine {
 		}
 
 		public abstract Expression EmitCondition(StateMachineEmitter<TComparand, TInput> emitter, ParameterExpression varContext);
+
+		public abstract bool TryGetComparand(out TComparand comparand);
 	}
 }
