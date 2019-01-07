@@ -18,6 +18,7 @@
 Collection of helper types and functions, including:
 - Generic Range structure (From..To) and range set operations (union, intersection etc.)
 - Generic equality comparers for sets, array content, references, etc.
+- Builders for compilable input-driven finite state machines ([Mealy machine](https://en.wikipedia.org/wiki/Mealy_machine))
 - GC-friendly linked-list buffer
 - BigDecimal (based on BigInteger, but with a decimal point position)
 - Unicode Codepoint and Grapheme structures and several helpers
