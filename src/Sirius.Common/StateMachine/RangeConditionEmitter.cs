@@ -15,14 +15,20 @@ namespace Sirius.StateMachine {
 
 		private static readonly MethodInfo meth_IComparable_Compare = Reflect<IComparable<TInput>>.GetMethod(v => v.CompareTo(default));
 
-		internal static BinaryExpression EmitSingleValueCompare(ParameterExpression varInput, TInput value) {
-			return typeof(TInput).IsPrimitive
+		internal static BinaryExpression EmitSingleValueCompare(ParameterExpression varInput, TInput value, bool equal) {
+			var left = typeof(TInput).IsPrimitive
+					? (Expression)varInput
+					: Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(value));
+			var right = typeof(TInput).IsPrimitive
+					? Expression.Constant(value)
+					: Expression.Constant(0);
+			return equal
 					? Expression.Equal(
-							varInput,
-							Expression.Constant(value))
-					: Expression.Equal(
-							Expression.Call(varInput, meth_IComparable_Compare, Expression.Constant(value)),
-							Expression.Constant(0));
+							left,
+							right)
+					: Expression.NotEqual(
+							left,
+							right);
 		}
 
 		/// <summary>Emits the condition to compare a single input against a range.</summary>
@@ -32,7 +38,7 @@ namespace Sirius.StateMachine {
 		public Expression Emit(Range<TInput> comparand, ParameterExpression varInput) {
 			switch (comparand.Expand().Take(3).Count()) {
 			case 1:
-				return EmitSingleValueCompare(varInput, comparand.From);
+				return EmitSingleValueCompare(varInput, comparand.From, true);
 			case 2:
 				return typeof(TInput).IsPrimitive
 						? Expression.OrElse(

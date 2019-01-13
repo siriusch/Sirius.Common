@@ -38,7 +38,7 @@ namespace Sirius.StateMachine {
 					}
 					yield return exclusions.Aggregate(
 							RangeConditionEmitter<TInput>.Default.Emit(currentRange, varInput),
-							(expr, excl) => Expression.AndAlso(expr, RangeConditionEmitter<TInput>.EmitSingleValueCompare(varInput, excl)));
+							(expr, excl) => Expression.AndAlso(expr, RangeConditionEmitter<TInput>.EmitSingleValueCompare(varInput, excl, false)));
 				} while (hasNext);
 			}
 		}
