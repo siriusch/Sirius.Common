@@ -22,7 +22,7 @@ namespace Sirius.StateMachine {
 
 		/// <summary>Gets a value indicating whether this object is configured.</summary>
 		/// <value>True if this object is configured, false if not.</value>
-		public bool IsConfigured => this.perform == null;
+		public bool IsConfigured => this.perform != null;
 
 		/// <summary>Statically continue processing at the given state when new input is received.</summary>
 		public void Break() {
